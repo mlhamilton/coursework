@@ -10,9 +10,12 @@
 <body>
     <h1>Product</h1>
 <form action="productMaint" method="post">
-    Code: <input type="text" name="code" value=${product.code} readonly><br/>
-    Description: <input type="text" name="description" value=${product.description}><br/>
-    Price: <input type="text" name="price" value=${product.price}><br/>
+    <label class="pad_top"> Code: </label>
+    <input type="text" name="code" value=${product.code} readonly><br/>
+    <label class="pad_top"> Description: </label>
+    <input type="text" name="description" value=${product.description} required><br/>
+    <label class="pad_top"> Price: </label>
+    <input type="text" name="price" value=${product.price} required><br/>
     
 
   <input type="hidden" name="action" value="updateProduct">

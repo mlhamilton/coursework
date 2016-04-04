@@ -31,6 +31,10 @@ public class CartServlet extends HttpServlet {
         // Get what the servlet is being asked to do
         String action = request.getParameter("action");
         
+        // Set default URL
+        
+        String url = "/cart.jsp";
+        
         // If the action is to displayProducts
         if (action.equals("displayProducts")) {
             
@@ -49,7 +53,7 @@ public class CartServlet extends HttpServlet {
             session.setAttribute("products", products);
             
             // Redirect to cart.jsp
-            String url = "/cart.jsp";
+            url = "/cart.jsp";
             sc.getRequestDispatcher(url)
                 .forward(request, response);
             
@@ -73,7 +77,7 @@ public class CartServlet extends HttpServlet {
             session.setAttribute("price", price);
             
             // Redirect
-            String url = "/addEdit.jsp";
+            url = "/addEdit.jsp";
             sc.getRequestDispatcher(url)
                 .forward(request, response);
         }   
@@ -91,12 +95,26 @@ public class CartServlet extends HttpServlet {
             //Create new product to store updated values
             Product product = new Product();
 
-            product.setDescription(description);
-            product.setPrice(price);
-            product.setCode(code);
-
+            //validate the parameters
+            String message;
+            if (code == null || description == null || newPrice == null ||
+                code.isEmpty() || description.isEmpty() || newPrice.isEmpty()) {
+                message = "Please fill out the required fields.";
+                url = "addEdit.jsp";
+            }
+            else {
+                message = "";
+                product.setDescription(description);
+                product.setPrice(price);
+                product.setCode(code);
+            }
+                
             // Call update if Edit was selected
             // Call insert if Add was selected
+            //#######################
+            //Seems like this is toggling the Add/Update button in addEdit.jsp 
+            //##########################
+            
             if (ProductIO.exists(code)) {
                 ProductIO.updateProduct(product);
             } else {
@@ -107,13 +125,13 @@ public class CartServlet extends HttpServlet {
             session.setAttribute("product", product);
 
             // Redirect
-            String url = "/addEdit.jsp";
+            url = "/addEdit.jsp";
             sc.getRequestDispatcher(url)
             .forward(request, response);
         }
         
         else if (action.equals("viewProducts")) {
-            String url = "/cart.jsp";
+            url = "/cart.jsp";
             sc.getRequestDispatcher(url)
             .forward(request, response);
         }
@@ -134,7 +152,7 @@ public class CartServlet extends HttpServlet {
             session.setAttribute("description", description);
             session.setAttribute("price", price);
             
-            String url = "/delete.jsp";
+            url = "/delete.jsp";
             
             sc.getRequestDispatcher(url)
                 .forward(request, response);
@@ -156,13 +174,13 @@ public class CartServlet extends HttpServlet {
             session.setAttribute("products", products);
 
             // Redirect
-            String url = "/cart.jsp";
+            url = "/cart.jsp";
             sc.getRequestDispatcher(url)
             .forward(request, response);
         }
         
         else if (action.equals("addProduct")) {
-            String url = "/addProduct.jsp";
+            url = "/addProduct.jsp";
             sc.getRequestDispatcher(url)
             .forward(request, response);
         }

@@ -1,0 +1,927 @@
+ch5-1EmailListServlet.java:package murach.email;
+ch5-1EmailListServlet.java:
+ch5-1EmailListServlet.java:import java.io.*;
+ch5-1EmailListServlet.java:import javax.servlet.*;
+ch5-1EmailListServlet.java:import javax.servlet.http.*;
+ch5-1EmailListServlet.java:
+ch5-1EmailListServlet.java:import murach.business.User;
+ch5-1EmailListServlet.java:import murach.data.UserDB;
+ch5-1EmailListServlet.java:
+ch5-1EmailListServlet.java:public class EmailListServlet extends HttpServlet {
+ch5-1EmailListServlet.java:
+ch5-1EmailListServlet.java:    @Override
+ch5-1EmailListServlet.java:    protected void doPost(HttpServletRequest request,
+ch5-1EmailListServlet.java:            HttpServletResponse response)
+ch5-1EmailListServlet.java:            throws ServletException, IOException {
+ch5-1EmailListServlet.java:        String url = "/index.jsp";
+ch5-1EmailListServlet.java:        
+ch5-1EmailListServlet.java:        // get current action
+ch5-1EmailListServlet.java:        String action = request.getParameter("action");
+ch5-1EmailListServlet.java:        
+ch5-1EmailListServlet.java:        //MH: Inserting error logging to show action
+ch5-1EmailListServlet.java:        System.out.println("EmailListServlet action: " + action + " ELEPHANT");
+ch5-1EmailListServlet.java:        log("ELEPHANT says action is: " + action);
+ch5-1EmailListServlet.java:        
+ch5-1EmailListServlet.java:        if (action == null) {
+ch5-1EmailListServlet.java:            action = "join";  // default action
+ch5-1EmailListServlet.java:        }
+ch5-1EmailListServlet.java:
+ch5-1EmailListServlet.java:        // perform action and set URL to appropriate page
+ch5-1EmailListServlet.java:        if (action.equals("join")) {
+ch5-1EmailListServlet.java:            url = "/index.jsp";    // the "join" page
+ch5-1EmailListServlet.java:        } 
+ch5-1EmailListServlet.java:        else if (action.equals("add")) {
+ch5-1EmailListServlet.java:            // get parameters from the request
+ch5-1EmailListServlet.java:            String firstName = request.getParameter("firstName");
+ch5-1EmailListServlet.java:            String lastName = request.getParameter("lastName");
+ch5-1EmailListServlet.java:            String email = request.getParameter("email");
+ch5-1EmailListServlet.java:            
+ch5-1EmailListServlet.java:            // store data in User object
+ch5-1EmailListServlet.java:            User user = new User(firstName, lastName, email);
+ch5-1EmailListServlet.java:
+ch5-1EmailListServlet.java:            // validate the parameters
+ch5-1EmailListServlet.java:            String message;
+ch5-1EmailListServlet.java:            if (firstName == null || lastName == null || email == null ||
+ch5-1EmailListServlet.java:                firstName.isEmpty() || lastName.isEmpty() || email.isEmpty()) {
+ch5-1EmailListServlet.java:                message = "Please fill out all three text boxes.";
+ch5-1EmailListServlet.java:                url = "/index.jsp";
+ch5-1EmailListServlet.java:            } 
+ch5-1EmailListServlet.java:            else {
+ch5-1EmailListServlet.java:                message = "";
+ch5-1EmailListServlet.java:                url = "/thanks.jsp";
+ch5-1EmailListServlet.java:                UserDB.insert(user);
+ch5-1EmailListServlet.java:            }
+ch5-1EmailListServlet.java:            request.setAttribute("user", user);
+ch5-1EmailListServlet.java:            request.setAttribute("message", message);
+ch5-1EmailListServlet.java:        }
+ch5-1EmailListServlet.java:        getServletContext()
+ch5-1EmailListServlet.java:                .getRequestDispatcher(url)
+ch5-1EmailListServlet.java:                .forward(request, response);
+ch5-1EmailListServlet.java:    }
+ch5-1EmailListServlet.java:    @Override
+ch5-1EmailListServlet.java:    protected void doGet(HttpServletRequest request,
+ch5-1EmailListServlet.java:            HttpServletResponse response)
+ch5-1EmailListServlet.java:            throws ServletException, IOException {
+ch5-1EmailListServlet.java:        doPost(request, response);
+ch5-1EmailListServlet.java:    }
+ch5-1EmailListServlet.java:}
+ch5-2EmailListServlet.java:package murach.email;
+ch5-2EmailListServlet.java:
+ch5-2EmailListServlet.java:import java.io.*;
+ch5-2EmailListServlet.java:import javax.servlet.*;
+ch5-2EmailListServlet.java:import javax.servlet.http.*;
+ch5-2EmailListServlet.java:
+ch5-2EmailListServlet.java:import murach.business.User;
+ch5-2EmailListServlet.java:import murach.data.UserDB;
+ch5-2EmailListServlet.java:
+ch5-2EmailListServlet.java:public class EmailListServlet extends HttpServlet {
+ch5-2EmailListServlet.java:
+ch5-2EmailListServlet.java:    @Override
+ch5-2EmailListServlet.java:    protected void doPost(HttpServletRequest request,
+ch5-2EmailListServlet.java:            HttpServletResponse response)
+ch5-2EmailListServlet.java:            throws ServletException, IOException {
+ch5-2EmailListServlet.java:        String url = "/index.jsp";
+ch5-2EmailListServlet.java:        
+ch5-2EmailListServlet.java:        // get current action
+ch5-2EmailListServlet.java:        String action = request.getParameter("action");
+ch5-2EmailListServlet.java:        if (action == null) {
+ch5-2EmailListServlet.java:            action = "join";  // default action
+ch5-2EmailListServlet.java:        }
+ch5-2EmailListServlet.java:
+ch5-2EmailListServlet.java:        // perform action and set URL to appropriate page
+ch5-2EmailListServlet.java:        if (action.equals("join")) {
+ch5-2EmailListServlet.java:            url = "/index.jsp";    // the "join" page
+ch5-2EmailListServlet.java:        } 
+ch5-2EmailListServlet.java:        else if (action.equals("add")) {
+ch5-2EmailListServlet.java:            // get parameters from the request
+ch5-2EmailListServlet.java:            String firstName = request.getParameter("firstName");
+ch5-2EmailListServlet.java:            String lastName = request.getParameter("lastName");
+ch5-2EmailListServlet.java:            String email = request.getParameter("email");
+ch5-2EmailListServlet.java:            
+ch5-2EmailListServlet.java:            // store data in User object
+ch5-2EmailListServlet.java:            User user = new User(firstName, lastName, email);
+ch5-2EmailListServlet.java:
+ch5-2EmailListServlet.java:            // validate the parameters
+ch5-2EmailListServlet.java:            String message;
+ch5-2EmailListServlet.java:            if (firstName == null || lastName == null || email == null ||
+ch5-2EmailListServlet.java:                firstName.isEmpty() || lastName.isEmpty() || email.isEmpty()) {
+ch5-2EmailListServlet.java:                message = "Please fill out all three text boxes.";
+ch5-2EmailListServlet.java:                url = "/index.jsp";
+ch5-2EmailListServlet.java:            } 
+ch5-2EmailListServlet.java:            else {
+ch5-2EmailListServlet.java:                message = "";
+ch5-2EmailListServlet.java:                url = "/thanks.jsp";
+ch5-2EmailListServlet.java:                UserDB.insert(user);
+ch5-2EmailListServlet.java:            }
+ch5-2EmailListServlet.java:            request.setAttribute("user", user);
+ch5-2EmailListServlet.java:            request.setAttribute("message", message);
+ch5-2EmailListServlet.java:        }
+ch5-2EmailListServlet.java:        getServletContext()
+ch5-2EmailListServlet.java:                .getRequestDispatcher(url)
+ch5-2EmailListServlet.java:                .forward(request, response);
+ch5-2EmailListServlet.java:    }
+ch5-2EmailListServlet.java:}
+ch5-2TestServlet.java:package murach.email;
+ch5-2TestServlet.java:
+ch5-2TestServlet.java:import java.io.IOException;
+ch5-2TestServlet.java:import java.io.PrintWriter;
+ch5-2TestServlet.java:import javax.servlet.ServletException;
+ch5-2TestServlet.java:import javax.servlet.http.HttpServlet;
+ch5-2TestServlet.java:import javax.servlet.http.HttpServletRequest;
+ch5-2TestServlet.java:import javax.servlet.http.HttpServletResponse;
+ch5-2TestServlet.java:
+ch5-2TestServlet.java:public class TestServlet extends HttpServlet {
+ch5-2TestServlet.java:
+ch5-2TestServlet.java:    @Override
+ch5-2TestServlet.java:    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+ch5-2TestServlet.java:            throws ServletException, IOException {
+ch5-2TestServlet.java:        response.setContentType("text/html; charset=UTF-8");
+ch5-2TestServlet.java:        PrintWriter out = response.getWriter();
+ch5-2TestServlet.java:        try{
+ch5-2TestServlet.java:        out.println("TestServlet POST");
+ch5-2TestServlet.java:        }
+ch5-2TestServlet.java:        finally{
+ch5-2TestServlet.java:            out.close();
+ch5-2TestServlet.java:        }
+ch5-2TestServlet.java:    }
+ch5-2TestServlet.java:    
+ch5-2TestServlet.java:    @Override
+ch5-2TestServlet.java:    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+ch5-2TestServlet.java:            throws ServletException, IOException {
+ch5-2TestServlet.java:        
+ch5-2TestServlet.java:        //set_contenttype, make_printwriter, print_stuff, finally_close
+ch5-2TestServlet.java:        response.setContentType("text/html; charset=UTF-8");
+ch5-2TestServlet.java:        PrintWriter out = response.getWriter();
+ch5-2TestServlet.java:        try{
+ch5-2TestServlet.java:        out.println("TestServlet GET");
+ch5-2TestServlet.java:        }
+ch5-2TestServlet.java:        finally{
+ch5-2TestServlet.java:            out.close();
+ch5-2TestServlet.java:        }
+ch5-2TestServlet.java:    }
+ch5-2TestServlet.java:}
+ch5-2index.jsp:<!DOCTYPE html>
+ch5-2index.jsp:<html>
+ch5-2index.jsp:<head>
+ch5-2index.jsp:    <meta charset="utf-8">
+ch5-2index.jsp:    <title>Murach's Java Servlets and JSP</title>
+ch5-2index.jsp:    <link rel="stylesheet" href="styles/main.css" type="text/css"/>
+ch5-2index.jsp:</head>
+ch5-2index.jsp:<body>
+ch5-2index.jsp:    <h1>Join our email list</h1>
+ch5-2index.jsp:    <p>To join our email list, enter your name and
+ch5-2index.jsp:       email address below.</p>
+ch5-2index.jsp:    <p><i>${message}</i></p>
+ch5-2index.jsp:    <form action="test" method="post">
+ch5-2index.jsp:        <input type="hidden" name="action" value="add">        
+ch5-2index.jsp:        <label class="pad_top">Email:</label>
+ch5-2index.jsp:        <input type="email" name="email" value="${user.email}"><br>
+ch5-2index.jsp:        <label class="pad_top">First Name:</label>
+ch5-2index.jsp:        <input type="text" name="firstName" value="${user.firstName}"><br>
+ch5-2index.jsp:        <label class="pad_top">Last Name:</label>
+ch5-2index.jsp:        <input type="text" name="lastName" value="${user.lastName}"><br>        
+ch5-2index.jsp:        <label>&nbsp;</label>
+ch5-2index.jsp:        <input type="submit" value="Join Now" class="margin_left">
+ch5-2index.jsp:    </form>
+ch5-2index.jsp:</body>
+ch5-2index.jsp:</html>
+ch6-1EmailListServlet.java:package murach.email;
+ch6-1EmailListServlet.java:
+ch6-1EmailListServlet.java:import java.io.*;
+ch6-1EmailListServlet.java:import javax.servlet.*;
+ch6-1EmailListServlet.java:import javax.servlet.http.*;
+ch6-1EmailListServlet.java:
+ch6-1EmailListServlet.java:import murach.business.User;
+ch6-1EmailListServlet.java:import murach.data.UserDB;
+ch6-1EmailListServlet.java:import java.util.GregorianCalendar;
+ch6-1EmailListServlet.java:import java.util.Calendar;
+ch6-1EmailListServlet.java:
+ch6-1EmailListServlet.java:public class EmailListServlet extends HttpServlet {
+ch6-1EmailListServlet.java:
+ch6-1EmailListServlet.java:    @Override
+ch6-1EmailListServlet.java:    protected void doPost(HttpServletRequest request,
+ch6-1EmailListServlet.java:            HttpServletResponse response)
+ch6-1EmailListServlet.java:            throws ServletException, IOException {
+ch6-1EmailListServlet.java:        String url = "/index.html";
+ch6-1EmailListServlet.java:        
+ch6-1EmailListServlet.java:        //Get int value for current year; set int as attribute of request
+ch6-1EmailListServlet.java:        GregorianCalendar currentDate = new GregorianCalendar();
+ch6-1EmailListServlet.java:        int currentYear = currentDate.get(Calendar.YEAR);
+ch6-1EmailListServlet.java:        request.setAttribute("currentYear", currentYear);
+ch6-1EmailListServlet.java:        System.out.println("Current Year: " + currentYear);
+ch6-1EmailListServlet.java:        
+ch6-1EmailListServlet.java:        // get current action
+ch6-1EmailListServlet.java:        String action = request.getParameter("action");
+ch6-1EmailListServlet.java:        if (action == null) {
+ch6-1EmailListServlet.java:            action = "join";  // default action
+ch6-1EmailListServlet.java:        }
+ch6-1EmailListServlet.java:
+ch6-1EmailListServlet.java:        // perform action and set URL to appropriate page
+ch6-1EmailListServlet.java:        if (action.equals("join")) {
+ch6-1EmailListServlet.java:            url = "/index.jsp";    // the "join" page
+ch6-1EmailListServlet.java:        } 
+ch6-1EmailListServlet.java:        else if (action.equals("add")) {
+ch6-1EmailListServlet.java:            // get parameters from the request
+ch6-1EmailListServlet.java:            String firstName = request.getParameter("firstName");
+ch6-1EmailListServlet.java:            String lastName = request.getParameter("lastName");
+ch6-1EmailListServlet.java:            String email = request.getParameter("email");
+ch6-1EmailListServlet.java:
+ch6-1EmailListServlet.java:            // store data in User object
+ch6-1EmailListServlet.java:            User user = new User(firstName, lastName, email);
+ch6-1EmailListServlet.java:
+ch6-1EmailListServlet.java:            // validate the parameters
+ch6-1EmailListServlet.java:            String message;
+ch6-1EmailListServlet.java:            if (firstName == null || lastName == null || email == null ||
+ch6-1EmailListServlet.java:                firstName.isEmpty() || lastName.isEmpty() || email.isEmpty()) {
+ch6-1EmailListServlet.java:                message = "Please fill out all three text boxes.";
+ch6-1EmailListServlet.java:                url = "/index.jsp";
+ch6-1EmailListServlet.java:            } 
+ch6-1EmailListServlet.java:            else {
+ch6-1EmailListServlet.java:                message = null;
+ch6-1EmailListServlet.java:                url = "/thanks.jsp";
+ch6-1EmailListServlet.java:                UserDB.insert(user);
+ch6-1EmailListServlet.java:            }
+ch6-1EmailListServlet.java:            request.setAttribute("user", user);
+ch6-1EmailListServlet.java:            request.setAttribute("message", message);
+ch6-1EmailListServlet.java:        }
+ch6-1EmailListServlet.java:        getServletContext()
+ch6-1EmailListServlet.java:                .getRequestDispatcher(url)
+ch6-1EmailListServlet.java:                .forward(request, response);
+ch6-1EmailListServlet.java:    }
+ch6-1EmailListServlet.java:    
+ch6-1EmailListServlet.java:    @Override
+ch6-1EmailListServlet.java:    protected void doGet(HttpServletRequest request,
+ch6-1EmailListServlet.java:            HttpServletResponse response)
+ch6-1EmailListServlet.java:            throws ServletException, IOException {
+ch6-1EmailListServlet.java:        doPost(request, response);
+ch6-1EmailListServlet.java:    }    
+ch6-1EmailListServlet.java:    
+ch6-1EmailListServlet.java:}
+ch6-1footer.jsp:
+ch6-1footer.jsp:<%--
+ch6-1footer.jsp:<%@ page import="java.util.GregorianCalendar, java.util.Calendar" %>
+ch6-1footer.jsp:<%  
+ch6-1footer.jsp:    GregorianCalendar currentDate = new GregorianCalendar();
+ch6-1footer.jsp:    int currentYear = currentDate.get(Calendar.YEAR);
+ch6-1footer.jsp:%>
+ch6-1footer.jsp:--%>
+ch6-1footer.jsp:
+ch6-1footer.jsp:<p>&copy; Copyright ${currentYear} Mike Murach &amp; Associates</p>
+ch6-1footer.jsp:</body>
+ch6-1footer.jsp:</html>
+ch6-1index.jsp:<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+ch6-1index.jsp:<%--Modifying to include at compile time--%>
+ch6-1index.jsp:<%@ include file="/includes/header.html" %>
+ch6-1index.jsp:
+ch6-1index.jsp:<h1>Join our email list</h1>
+ch6-1index.jsp:<p>To join our email list, enter your name and
+ch6-1index.jsp:   email address below.</p>
+ch6-1index.jsp:
+ch6-1index.jsp:<c:if test="${message != null}">
+ch6-1index.jsp:    <p><i>${message}</i></p>
+ch6-1index.jsp:</c:if>
+ch6-1index.jsp:
+ch6-1index.jsp:<form action="emailList" method="post">
+ch6-1index.jsp:    <input type="hidden" name="action" value="add">        
+ch6-1index.jsp:    <label class="pad_top">Email:</label>
+ch6-1index.jsp:    <input type="email" name="email" value="${user.email}"><br>
+ch6-1index.jsp:    <label class="pad_top">First Name:</label>
+ch6-1index.jsp:    <input type="text" name="firstName" value="${user.firstName}"><br>
+ch6-1index.jsp:    <label class="pad_top">Last Name:</label>
+ch6-1index.jsp:    <input type="text" name="lastName" value="${user.lastName}"><br>        
+ch6-1index.jsp:    <label>&nbsp;</label>
+ch6-1index.jsp:    <input type="submit" value="Join Now" class="margin_left">
+ch6-1index.jsp:</form>
+ch6-1index.jsp:
+ch6-1index.jsp:<%--Modifying to include at compile time--%>
+ch6-1index.jsp:<%@ include file="/includes/footer.jsp" %>
+ch6-1thanks.jsp:<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+ch6-1thanks.jsp:<%--Modifying to include at compile time--%>
+ch6-1thanks.jsp:<%@ include file="/includes/header.html" %>
+ch6-1thanks.jsp:
+ch6-1thanks.jsp:<h1>Thanks for joining our email list</h1>
+ch6-1thanks.jsp:
+ch6-1thanks.jsp:<p>Here is the information that you entered:</p>
+ch6-1thanks.jsp:<label>Email:</label>
+ch6-1thanks.jsp:<span>${user.email}</span><br>
+ch6-1thanks.jsp:<label>First Name:</label>
+ch6-1thanks.jsp:<span>${user.firstName}</span><br>
+ch6-1thanks.jsp:<label>Last Name:</label>
+ch6-1thanks.jsp:<span>${user.lastName}</span><br>
+ch6-1thanks.jsp:
+ch6-1thanks.jsp:<p>To enter another email address, click on the Back 
+ch6-1thanks.jsp:button in your browser or the Return button shown 
+ch6-1thanks.jsp:below.</p>
+ch6-1thanks.jsp:
+ch6-1thanks.jsp:<form action="" method="post">
+ch6-1thanks.jsp:    <input type="hidden" name="action" value="join">
+ch6-1thanks.jsp:    <input type="submit" value="Return">
+ch6-1thanks.jsp:</form>
+ch6-1thanks.jsp:
+ch6-1thanks.jsp:<%@ include file="/includes/footer.jsp" %>
+ch6-2survey.jsp:<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+ch6-2survey.jsp:
+ch6-2survey.jsp:<h1>Thanks for taking our survey!</h1>
+ch6-2survey.jsp:
+ch6-2survey.jsp:<p>Here is the information that you entered:</p>
+ch6-2survey.jsp:<label>Email:</label>
+ch6-2survey.jsp:<span>${user.email}</span><br>
+ch6-2survey.jsp:<label>First Name:</label>
+ch6-2survey.jsp:<span>${user.firstName}</span><br>
+ch6-2survey.jsp:<label>Last Name:</label>
+ch6-2survey.jsp:<span>${user.lastName}</span><br>
+ch6-2survey.jsp:<label>Search Engine:</label>
+ch6-2survey.jsp:<span>${user.heardFrom}</span><br>
+ch6-2survey.jsp:<label>Updates:</label>
+ch6-2survey.jsp:<span>${user.wantsUpdates}</span><br>
+ch6-2survey.jsp:<c:if test="${user.wantsUpdates == 'Yes'}">
+ch6-2survey.jsp:    <label>Contact Via:</label>
+ch6-2survey.jsp:    <span>${user.contactVia}</span><br>
+ch6-2survey.jsp:</c:if>
+ch6-2survey.jsp:
+ch6-2survey.jsp:<p>To enter another email address, click on the Back 
+ch6-2survey.jsp:button in your browser or the Return button shown 
+ch6-2survey.jsp:below.</p>
+ch6-2survey.jsp:
+ch6-2survey.jsp:
+ch6-2survey.jsp:<%-- How do I use post instead???--%>
+ch6-2survey.jsp:<form action="index" method="get">
+ch6-2survey.jsp:    <%-- Probably used for DB
+ch6-2survey.jsp:    <input type="hidden" name="action" value="join">
+ch6-2survey.jsp:    --%>
+ch6-2survey.jsp:    <input type="submit" value="Return">
+ch6-2survey.jsp:</form>
+ch7-1DownloadServlet.java:package murach.download;
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:import java.io.*;
+ch7-1DownloadServlet.java:import javax.servlet.*;
+ch7-1DownloadServlet.java:import javax.servlet.http.*;
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:import murach.business.User;
+ch7-1DownloadServlet.java:import murach.data.UserIO;
+ch7-1DownloadServlet.java:import murach.util.CookieUtil;
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:public class DownloadServlet extends HttpServlet {
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:    @Override
+ch7-1DownloadServlet.java:    public void doGet(HttpServletRequest request,
+ch7-1DownloadServlet.java:            HttpServletResponse response)
+ch7-1DownloadServlet.java:            throws IOException, ServletException {
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        // get current action
+ch7-1DownloadServlet.java:        String action = request.getParameter("action");
+ch7-1DownloadServlet.java:        if (action == null) {
+ch7-1DownloadServlet.java:            action = "viewAlbums";  // default action
+ch7-1DownloadServlet.java:        }
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        // perform action and set URL to appropriate page
+ch7-1DownloadServlet.java:        String url = "/index.jsp";
+ch7-1DownloadServlet.java:        if (action.equals("viewAlbums")) {
+ch7-1DownloadServlet.java:            url = "/index.jsp";
+ch7-1DownloadServlet.java:        } else if (action.equals("checkUser")) {
+ch7-1DownloadServlet.java:            url = checkUser(request, response);
+ch7-1DownloadServlet.java:        } else if (action.equals("viewCookies")) {
+ch7-1DownloadServlet.java:            url = "/view_cookies.jsp";
+ch7-1DownloadServlet.java:        } else if (action.equals("deleteCookies")) {
+ch7-1DownloadServlet.java:            url = deleteCookies(request, response);
+ch7-1DownloadServlet.java:        }
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        // forward to the view
+ch7-1DownloadServlet.java:        getServletContext()
+ch7-1DownloadServlet.java:                .getRequestDispatcher(url)
+ch7-1DownloadServlet.java:                .forward(request, response);
+ch7-1DownloadServlet.java:    }
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:    @Override
+ch7-1DownloadServlet.java:    public void doPost(HttpServletRequest request,
+ch7-1DownloadServlet.java:            HttpServletResponse response)
+ch7-1DownloadServlet.java:            throws IOException, ServletException {
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        String action = request.getParameter("action");
+ch7-1DownloadServlet.java:        
+ch7-1DownloadServlet.java:        // perform action and set URL to appropriate page
+ch7-1DownloadServlet.java:        String url = "/index.jsp";
+ch7-1DownloadServlet.java:        if (action.equals("registerUser")) {
+ch7-1DownloadServlet.java:            url = registerUser(request, response);
+ch7-1DownloadServlet.java:        }
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        // forward to the view
+ch7-1DownloadServlet.java:        getServletContext()
+ch7-1DownloadServlet.java:                .getRequestDispatcher(url)
+ch7-1DownloadServlet.java:                .forward(request, response);
+ch7-1DownloadServlet.java:    }
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:    private String checkUser(HttpServletRequest request,
+ch7-1DownloadServlet.java:            HttpServletResponse response) {
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        String productCode = request.getParameter("productCode");
+ch7-1DownloadServlet.java:        HttpSession session = request.getSession();
+ch7-1DownloadServlet.java:        session.setAttribute("productCode", productCode);
+ch7-1DownloadServlet.java:        User user = (User) session.getAttribute("user");
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        String url;
+ch7-1DownloadServlet.java:        // if User object doesn't exist, check email cookie
+ch7-1DownloadServlet.java:        if (user == null) {
+ch7-1DownloadServlet.java:            Cookie[] cookies = request.getCookies();
+ch7-1DownloadServlet.java:            String emailAddress = 
+ch7-1DownloadServlet.java:                CookieUtil.getCookieValue(cookies, "emailCookie");
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:            // if cookie doesn't exist, go to Registration page
+ch7-1DownloadServlet.java:            if (emailAddress == null || emailAddress.equals("")) {
+ch7-1DownloadServlet.java:                url = "/register.jsp";
+ch7-1DownloadServlet.java:            } 
+ch7-1DownloadServlet.java:            // if cookie exists, create User object and go to Downloads page
+ch7-1DownloadServlet.java:            else {
+ch7-1DownloadServlet.java:                ServletContext sc = getServletContext();
+ch7-1DownloadServlet.java:                String path = sc.getRealPath("/WEB-INF/EmailList.txt");
+ch7-1DownloadServlet.java:                user = UserIO.getUser(emailAddress, path);
+ch7-1DownloadServlet.java:                session.setAttribute("user", user);
+ch7-1DownloadServlet.java:                url = "/" + productCode + "_download.jsp";
+ch7-1DownloadServlet.java:            }
+ch7-1DownloadServlet.java:        } 
+ch7-1DownloadServlet.java:        // if User object exists, go to Downloads page
+ch7-1DownloadServlet.java:        else {
+ch7-1DownloadServlet.java:            url = "/" + productCode + "_download.jsp";
+ch7-1DownloadServlet.java:        }
+ch7-1DownloadServlet.java:        return url;
+ch7-1DownloadServlet.java:    }
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:    private String registerUser(HttpServletRequest request,
+ch7-1DownloadServlet.java:            HttpServletResponse response) {
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:         // get the user data
+ch7-1DownloadServlet.java:        String email = request.getParameter("email");
+ch7-1DownloadServlet.java:        String firstName = request.getParameter("firstName");
+ch7-1DownloadServlet.java:        String lastName = request.getParameter("lastName");
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        // store the data in a User object
+ch7-1DownloadServlet.java:        User user = new User();
+ch7-1DownloadServlet.java:        user.setEmail(email);
+ch7-1DownloadServlet.java:        user.setFirstName(firstName);
+ch7-1DownloadServlet.java:        user.setLastName(lastName);
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        // write the User object to a file
+ch7-1DownloadServlet.java:        ServletContext sc = getServletContext();
+ch7-1DownloadServlet.java:        String path = sc.getRealPath("/WEB-INF/EmailList.txt");
+ch7-1DownloadServlet.java:        UserIO.add(user, path);
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        // store the User object as a session attribute
+ch7-1DownloadServlet.java:        HttpSession session = request.getSession();
+ch7-1DownloadServlet.java:        session.setAttribute("user", user);
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        // add a cookie that stores the user's email to browser
+ch7-1DownloadServlet.java:        Cookie c = new Cookie("userEmail", email);  //store cookie with name userEmail
+ch7-1DownloadServlet.java:        c.setMaxAge(60 * 60 * 24 * 365 * 3); // set age to 3 years -MH Edit
+ch7-1DownloadServlet.java:        c.setPath("/");                      // allow entire app to access it
+ch7-1DownloadServlet.java:        response.addCookie(c);
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        // create and return a URL for the appropriate Download page
+ch7-1DownloadServlet.java:        String productCode = (String) session.getAttribute("productCode");
+ch7-1DownloadServlet.java:        String url = "/" + productCode + "_download.jsp";
+ch7-1DownloadServlet.java:        return url;
+ch7-1DownloadServlet.java:   }
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:    private String deleteCookies(HttpServletRequest request,
+ch7-1DownloadServlet.java:            HttpServletResponse response) {
+ch7-1DownloadServlet.java:
+ch7-1DownloadServlet.java:        Cookie[] cookies = request.getCookies();
+ch7-1DownloadServlet.java:        for (Cookie cookie : cookies) {
+ch7-1DownloadServlet.java:            cookie.setMaxAge(0); //delete the cookie
+ch7-1DownloadServlet.java:            cookie.setPath("/"); //allow the download application to access it
+ch7-1DownloadServlet.java:            response.addCookie(cookie);
+ch7-1DownloadServlet.java:        }
+ch7-1DownloadServlet.java:        String url = "/delete_cookies.jsp";
+ch7-1DownloadServlet.java:        return url;
+ch7-1DownloadServlet.java:    }
+ch7-1DownloadServlet.java:}
+ch7-1index.jsp:<!DOCTYPE html>
+ch7-1index.jsp:<html>
+ch7-1index.jsp:<head>
+ch7-1index.jsp:    <meta charset="utf-8">
+ch7-1index.jsp:    <title>Murach's Java Servlets and JSP</title>
+ch7-1index.jsp:    <link rel="stylesheet" href="styles/main.css" type="text/css"/>
+ch7-1index.jsp:</head>
+ch7-1index.jsp:<body>
+ch7-1index.jsp:<!--MH: Displaying name.value of userEmail cookie-->
+ch7-1index.jsp:
+ch7-1index.jsp:<p>User Email: ${cookie.userEmail.value}</p>
+ch7-1index.jsp:    
+ch7-1index.jsp:<h1>List of albums</h1>
+ch7-1index.jsp:
+ch7-1index.jsp:<p>
+ch7-1index.jsp:<a href="download?action=checkUser&amp;productCode=8601">
+ch7-1index.jsp:    86 (the band) - True Life Songs and Pictures
+ch7-1index.jsp:</a><br>
+ch7-1index.jsp:
+ch7-1index.jsp:<a href="download?action=checkUser&amp;productCode=pf01">
+ch7-1index.jsp:    Paddlefoot - The First CD
+ch7-1index.jsp:</a><br>
+ch7-1index.jsp:
+ch7-1index.jsp:<a href="download?action=checkUser&amp;productCode=pf02">
+ch7-1index.jsp:    Paddlefoot - The Second CD
+ch7-1index.jsp:</a><br>
+ch7-1index.jsp:
+ch7-1index.jsp:<a href="download?action=checkUser&amp;productCode=jr01">
+ch7-1index.jsp:    Joe Rut - Genuine Wood Grained Finish
+ch7-1index.jsp:</a>
+ch7-1index.jsp:</p>
+ch7-1index.jsp:
+ch7-1index.jsp:</body>
+ch7-1index.jsp:</html>
+ch7-2DownloadServlet.java:package murach.download;
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:import java.io.*;
+ch7-2DownloadServlet.java:import javax.servlet.*;
+ch7-2DownloadServlet.java:import javax.servlet.http.*;
+ch7-2DownloadServlet.java:import murach.business.Product;
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:import murach.business.User;
+ch7-2DownloadServlet.java:import murach.data.ProductIO;
+ch7-2DownloadServlet.java:import murach.data.UserIO;
+ch7-2DownloadServlet.java:import murach.util.CookieUtil;
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:public class DownloadServlet extends HttpServlet {
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:    @Override
+ch7-2DownloadServlet.java:    public void doGet(HttpServletRequest request,
+ch7-2DownloadServlet.java:            HttpServletResponse response)
+ch7-2DownloadServlet.java:            throws IOException, ServletException {
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        // get current action
+ch7-2DownloadServlet.java:        String action = request.getParameter("action");
+ch7-2DownloadServlet.java:        if (action == null) {
+ch7-2DownloadServlet.java:            action = "viewAlbums";  // default action
+ch7-2DownloadServlet.java:        }
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        // perform action and set URL to appropriate page
+ch7-2DownloadServlet.java:        String url = "/index.jsp";
+ch7-2DownloadServlet.java:        if (action.equals("viewAlbums")) {
+ch7-2DownloadServlet.java:            url = "/index.jsp";
+ch7-2DownloadServlet.java:        } else if (action.equals("checkUser")) {
+ch7-2DownloadServlet.java:            url = checkUser(request, response);
+ch7-2DownloadServlet.java:        } else if (action.equals("viewCookies")) {
+ch7-2DownloadServlet.java:            url = "/view_cookies.jsp";
+ch7-2DownloadServlet.java:        } else if (action.equals("deleteCookies")) {
+ch7-2DownloadServlet.java:            url = deleteCookies(request, response);
+ch7-2DownloadServlet.java:        }
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        // forward to the view
+ch7-2DownloadServlet.java:        getServletContext()
+ch7-2DownloadServlet.java:                .getRequestDispatcher(url)
+ch7-2DownloadServlet.java:                .forward(request, response);
+ch7-2DownloadServlet.java:    }
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:    @Override
+ch7-2DownloadServlet.java:    public void doPost(HttpServletRequest request,
+ch7-2DownloadServlet.java:            HttpServletResponse response)
+ch7-2DownloadServlet.java:            throws IOException, ServletException {
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        String action = request.getParameter("action");
+ch7-2DownloadServlet.java:        
+ch7-2DownloadServlet.java:        // perform action and set URL to appropriate page
+ch7-2DownloadServlet.java:        String url = "/index.jsp";
+ch7-2DownloadServlet.java:        if (action.equals("registerUser")) {
+ch7-2DownloadServlet.java:            url = registerUser(request, response);
+ch7-2DownloadServlet.java:        }
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        // forward to the view
+ch7-2DownloadServlet.java:        getServletContext()
+ch7-2DownloadServlet.java:                .getRequestDispatcher(url)
+ch7-2DownloadServlet.java:                .forward(request, response);
+ch7-2DownloadServlet.java:    }
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:    private String checkUser(HttpServletRequest request,
+ch7-2DownloadServlet.java:            HttpServletResponse response) {
+ch7-2DownloadServlet.java:        
+ch7-2DownloadServlet.java://        MH: Setting Product object as the session attribute
+ch7-2DownloadServlet.java://        !Old:
+ch7-2DownloadServlet.java://
+ch7-2DownloadServlet.java://        String productCode = request.getParameter("productCode");
+ch7-2DownloadServlet.java://        HttpSession session = request.getSession();        
+ch7-2DownloadServlet.java://        session.setAttribute("productCode", productCode);
+ch7-2DownloadServlet.java://        User user = (User) session.getAttribute("user");
+ch7-2DownloadServlet.java://
+ch7-2DownloadServlet.java://        !New:
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        String productCode = request.getParameter("productCode");
+ch7-2DownloadServlet.java:        HttpSession session = request.getSession();        
+ch7-2DownloadServlet.java:        User user = (User) session.getAttribute("user");
+ch7-2DownloadServlet.java:        ServletContext sc = this.getServletContext();
+ch7-2DownloadServlet.java:        String productPath = sc.getRealPath("WEB-INF/products.txt");
+ch7-2DownloadServlet.java:        Product product = ProductIO.getProduct(productCode, productPath);
+ch7-2DownloadServlet.java:        //set Product as attribute
+ch7-2DownloadServlet.java:        session.setAttribute("product", product);
+ch7-2DownloadServlet.java:        
+ch7-2DownloadServlet.java:        
+ch7-2DownloadServlet.java:        String url;
+ch7-2DownloadServlet.java:        // if User object doesn't exist, check email cookie
+ch7-2DownloadServlet.java:        if (user == null) {
+ch7-2DownloadServlet.java:            Cookie[] cookies = request.getCookies();
+ch7-2DownloadServlet.java:            String emailAddress = 
+ch7-2DownloadServlet.java:                CookieUtil.getCookieValue(cookies, "emailCookie");
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:            // if cookie doesn't exist, go to Registration page
+ch7-2DownloadServlet.java:            if (emailAddress == null || emailAddress.equals("")) {
+ch7-2DownloadServlet.java:                url = "/register.jsp";
+ch7-2DownloadServlet.java:            } 
+ch7-2DownloadServlet.java:            // if cookie exists, create User object and go to Downloads page
+ch7-2DownloadServlet.java:            else {
+ch7-2DownloadServlet.java:                //MH: Not needed?
+ch7-2DownloadServlet.java:                //ServletContext sc = getServletContext();
+ch7-2DownloadServlet.java:                String path = sc.getRealPath("/WEB-INF/EmailList.txt");
+ch7-2DownloadServlet.java:                user = UserIO.getUser(emailAddress, path);
+ch7-2DownloadServlet.java:                session.setAttribute("user", user);
+ch7-2DownloadServlet.java:                url = "/" + productCode + "_download.jsp";
+ch7-2DownloadServlet.java:            }
+ch7-2DownloadServlet.java:        } 
+ch7-2DownloadServlet.java:        // if User object exists, go to Downloads page
+ch7-2DownloadServlet.java:        else {
+ch7-2DownloadServlet.java:            url = "/" + productCode + "_download.jsp";
+ch7-2DownloadServlet.java:        }
+ch7-2DownloadServlet.java:        return url;
+ch7-2DownloadServlet.java:    }
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:    private String registerUser(HttpServletRequest request,
+ch7-2DownloadServlet.java:            HttpServletResponse response) {
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:         // get the user data
+ch7-2DownloadServlet.java:        String email = request.getParameter("email");
+ch7-2DownloadServlet.java:        String firstName = request.getParameter("firstName");
+ch7-2DownloadServlet.java:        String lastName = request.getParameter("lastName");
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        // store the data in a User object
+ch7-2DownloadServlet.java:        User user = new User();
+ch7-2DownloadServlet.java:        user.setEmail(email);
+ch7-2DownloadServlet.java:        user.setFirstName(firstName);
+ch7-2DownloadServlet.java:        user.setLastName(lastName);
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        // write the User object to a file
+ch7-2DownloadServlet.java:        ServletContext sc = getServletContext();
+ch7-2DownloadServlet.java:        String path = sc.getRealPath("/WEB-INF/EmailList.txt");
+ch7-2DownloadServlet.java:        UserIO.add(user, path);
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        // store the User object as a session attribute
+ch7-2DownloadServlet.java:        HttpSession session = request.getSession();
+ch7-2DownloadServlet.java:        session.setAttribute("user", user);
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        // add a cookie that stores the user's email to browser
+ch7-2DownloadServlet.java:        Cookie c = new Cookie("emailCookie", email);
+ch7-2DownloadServlet.java:        c.setMaxAge(60 * 60 * 24 * 365 * 2); // set age to 2 years
+ch7-2DownloadServlet.java:        c.setPath("/");                      // allow entire app to access it
+ch7-2DownloadServlet.java:        response.addCookie(c);
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        // create and return a URL for the appropriate Download page
+ch7-2DownloadServlet.java:        
+ch7-2DownloadServlet.java:        //MH: Using Product object to build url
+ch7-2DownloadServlet.java:        //String productCode = (String) session.getAttribute("productCode");
+ch7-2DownloadServlet.java:        //String url = "/" + productCode + "_download.jsp";
+ch7-2DownloadServlet.java:        Product product = (Product) session.getAttribute("product");
+ch7-2DownloadServlet.java:        String url = "/" + product.getCode() + "_download.jsp";
+ch7-2DownloadServlet.java:        return url;
+ch7-2DownloadServlet.java:   }
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:    private String deleteCookies(HttpServletRequest request,
+ch7-2DownloadServlet.java:            HttpServletResponse response) {
+ch7-2DownloadServlet.java:
+ch7-2DownloadServlet.java:        Cookie[] cookies = request.getCookies();
+ch7-2DownloadServlet.java:        for (Cookie cookie : cookies) {
+ch7-2DownloadServlet.java:            cookie.setMaxAge(0); //delete the cookie
+ch7-2DownloadServlet.java:            cookie.setPath("/"); //allow the download application to access it
+ch7-2DownloadServlet.java:            response.addCookie(cookie);
+ch7-2DownloadServlet.java:        }
+ch7-2DownloadServlet.java:        String url = "/delete_cookies.jsp";
+ch7-2DownloadServlet.java:        return url;
+ch7-2DownloadServlet.java:    }
+ch7-2DownloadServlet.java:}
+ch7-3CartServlet.java:package murach.cart;
+ch7-3CartServlet.java:
+ch7-3CartServlet.java:import murach.data.ProductIO;
+ch7-3CartServlet.java:import murach.business.LineItem;
+ch7-3CartServlet.java:import murach.business.Cart;
+ch7-3CartServlet.java:import murach.business.Product;
+ch7-3CartServlet.java:import java.io.*;
+ch7-3CartServlet.java:import javax.servlet.*;
+ch7-3CartServlet.java:import javax.servlet.http.*;
+ch7-3CartServlet.java:
+ch7-3CartServlet.java:
+ch7-3CartServlet.java:public class CartServlet extends HttpServlet {
+ch7-3CartServlet.java:
+ch7-3CartServlet.java:    @Override
+ch7-3CartServlet.java:    protected void doPost(HttpServletRequest request,
+ch7-3CartServlet.java:            HttpServletResponse response)
+ch7-3CartServlet.java:            throws ServletException, IOException {
+ch7-3CartServlet.java:        
+ch7-3CartServlet.java:        String url = "/index.jsp";
+ch7-3CartServlet.java:        ServletContext sc = getServletContext();
+ch7-3CartServlet.java:        
+ch7-3CartServlet.java:        // get current action
+ch7-3CartServlet.java:        String action = request.getParameter("action");
+ch7-3CartServlet.java:        if (action == null) {
+ch7-3CartServlet.java:            action = "cart";  // default action
+ch7-3CartServlet.java:        }
+ch7-3CartServlet.java:
+ch7-3CartServlet.java:        // perform action and set URL to appropriate page
+ch7-3CartServlet.java:        if (action.equals("shop")) {
+ch7-3CartServlet.java:            url = "/index.jsp";    // the "index" page
+ch7-3CartServlet.java:        } 
+ch7-3CartServlet.java:        else if (action.equals("cart")) {
+ch7-3CartServlet.java:            String productCode = request.getParameter("productCode");
+ch7-3CartServlet.java:            String quantityString = request.getParameter("quantity");
+ch7-3CartServlet.java:
+ch7-3CartServlet.java:            HttpSession session = request.getSession();
+ch7-3CartServlet.java:            Cart cart = (Cart) session.getAttribute("cart");
+ch7-3CartServlet.java:            if (cart == null) {
+ch7-3CartServlet.java:                cart = new Cart();
+ch7-3CartServlet.java:            }
+ch7-3CartServlet.java:
+ch7-3CartServlet.java:            //if the user enters a negative or invalid quantity,
+ch7-3CartServlet.java:            //the quantity is automatically reset to 1.
+ch7-3CartServlet.java:            int quantity;
+ch7-3CartServlet.java:            try {
+ch7-3CartServlet.java:                quantity = Integer.parseInt(quantityString);
+ch7-3CartServlet.java:                if (quantity < 0) {
+ch7-3CartServlet.java:                    quantity = 1;
+ch7-3CartServlet.java:                }
+ch7-3CartServlet.java:            } catch (NumberFormatException nfe) {
+ch7-3CartServlet.java:                quantity = 1;
+ch7-3CartServlet.java:            }
+ch7-3CartServlet.java:
+ch7-3CartServlet.java:            String path = sc.getRealPath("/WEB-INF/products.txt");
+ch7-3CartServlet.java:            Product product = ProductIO.getProduct(productCode, path);
+ch7-3CartServlet.java:
+ch7-3CartServlet.java:            LineItem lineItem = new LineItem();
+ch7-3CartServlet.java:            lineItem.setProduct(product);
+ch7-3CartServlet.java:            lineItem.setQuantity(quantity);
+ch7-3CartServlet.java:            if (quantity > 0) {
+ch7-3CartServlet.java:                cart.addItem(lineItem);
+ch7-3CartServlet.java:            } else if (quantity == 0) {
+ch7-3CartServlet.java:                cart.removeItem(lineItem);
+ch7-3CartServlet.java:            }
+ch7-3CartServlet.java:
+ch7-3CartServlet.java:            session.setAttribute("cart", cart);
+ch7-3CartServlet.java:            url = "/cart.jsp";
+ch7-3CartServlet.java:        }
+ch7-3CartServlet.java:        else if (action.equals("checkout")) {
+ch7-3CartServlet.java:            url = "/checkout.jsp";
+ch7-3CartServlet.java:        }
+ch7-3CartServlet.java:
+ch7-3CartServlet.java:        sc.getRequestDispatcher(url)
+ch7-3CartServlet.java:                .forward(request, response);
+ch7-3CartServlet.java:    }
+ch7-3CartServlet.java:    //Adding a doGet method to include statement calling doPost
+ch7-3CartServlet.java:    protected void doGet(HttpServletRequest request,
+ch7-3CartServlet.java:            HttpServletResponse response)
+ch7-3CartServlet.java:            throws ServletException, IOException {
+ch7-3CartServlet.java:        doPost(request, response);
+ch7-3CartServlet.java:    }    
+ch7-3CartServlet.java:}
+ch7-3cart.jsp:<!DOCTYPE html>
+ch7-3cart.jsp:<html>
+ch7-3cart.jsp:<head>
+ch7-3cart.jsp:    <meta charset="utf-8">
+ch7-3cart.jsp:    <title>Murach's Java Servlets and JSP</title>
+ch7-3cart.jsp:    <link rel="stylesheet" href="styles/main.css" type="text/css"/>
+ch7-3cart.jsp:</head>
+ch7-3cart.jsp:<body>
+ch7-3cart.jsp:
+ch7-3cart.jsp:<h1>Your cart</h1>
+ch7-3cart.jsp:
+ch7-3cart.jsp:<table>
+ch7-3cart.jsp:  <tr>
+ch7-3cart.jsp:    <th>Quantity</th>
+ch7-3cart.jsp:    <th>Description</th>
+ch7-3cart.jsp:    <th>Price</th>
+ch7-3cart.jsp:    <th>Amount</th>
+ch7-3cart.jsp:    <th></th>
+ch7-3cart.jsp:  </tr>
+ch7-3cart.jsp:
+ch7-3cart.jsp:<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+ch7-3cart.jsp:<c:forEach var="item" items="${cart.items}">
+ch7-3cart.jsp:  <tr>
+ch7-3cart.jsp:    <td>
+ch7-3cart.jsp:      <form action="cart" method="post">
+ch7-3cart.jsp:        <input type="hidden" name="productCode" value="${item.product.code}">
+ch7-3cart.jsp:        <input type=text name="quantity" value="${item.quantity}" id="quantity">
+ch7-3cart.jsp:        <input type="submit" value="Update">
+ch7-3cart.jsp:      </form>
+ch7-3cart.jsp:    </td>
+ch7-3cart.jsp:    <td>${item.product.description}</td>
+ch7-3cart.jsp:    <td>${item.product.priceCurrencyFormat}</td>
+ch7-3cart.jsp:    <td>${item.totalCurrencyFormat}</td>
+ch7-3cart.jsp:    <td>
+ch7-3cart.jsp:      <form action="cart" method="post">
+ch7-3cart.jsp:        <input type="hidden" name="productCode" 
+ch7-3cart.jsp:               value="${item.product.code}">
+ch7-3cart.jsp:        <input type="hidden" name="quantity" 
+ch7-3cart.jsp:               value="0">
+ch7-3cart.jsp:      </form>
+ch7-3cart.jsp:        <%--Make Remove a link supporting URL rewriting
+ch7-3cart.jsp:        <input type="submit" value="Remove Item">
+ch7-3cart.jsp:        --%>
+ch7-3cart.jsp:      
+ch7-3cart.jsp:      <a href="cart?productCode=${item.product.code}&amp;quantity=0">Remove Item</a>
+ch7-3cart.jsp:      
+ch7-3cart.jsp:    </td>
+ch7-3cart.jsp:  </tr>
+ch7-3cart.jsp:</c:forEach>
+ch7-3cart.jsp:</table>
+ch7-3cart.jsp:
+ch7-3cart.jsp:<p><b>To change the quantity</b>, enter the new quantity 
+ch7-3cart.jsp:      and click on the Update button.</p>
+ch7-3cart.jsp:  
+ch7-3cart.jsp:<form action="" method="post">
+ch7-3cart.jsp:  <input type="hidden" name="action" value="shop">
+ch7-3cart.jsp:  <input type="submit" value="Continue Shopping">
+ch7-3cart.jsp:</form>
+ch7-3cart.jsp:
+ch7-3cart.jsp:<form action="checkout.jsp" method="post">
+ch7-3cart.jsp:  <input type="hidden" name="action" value="checkout">
+ch7-3cart.jsp:  <input type="submit" value="Checkout">
+ch7-3cart.jsp:</form>
+ch7-3cart.jsp:
+ch7-3cart.jsp:</body>
+ch7-3cart.jsp:</html>
+ch8-1index.jsp:<!DOCTYPE html>
+ch8-1index.jsp:<html>
+ch8-1index.jsp:<head>
+ch8-1index.jsp:    <meta charset="utf-8">
+ch8-1index.jsp:    <title>Murach's Java Servlets and JSP</title>
+ch8-1index.jsp:    <link rel="stylesheet" href="styles/main.css" type="text/css"/>
+ch8-1index.jsp:</head>
+ch8-1index.jsp:<body>
+ch8-1index.jsp:    <h1>Join our email list</h1>
+ch8-1index.jsp:    <p>To join our email list, enter your name and
+ch8-1index.jsp:       email address below.</p>
+ch8-1index.jsp:    <%--Converting JSP to EL
+ch8-1index.jsp:    <jsp:useBean id="user" scope="session" class="murach.business.User"/>    
+ch8-1index.jsp:    --%>
+ch8-1index.jsp:    
+ch8-1index.jsp:    <form action="emailList" method="post">
+ch8-1index.jsp:        <input type="hidden" name="action" value="add">        
+ch8-1index.jsp:        <label class="pad_top">Email:</label>
+ch8-1index.jsp:        <input type="email" name="email" 
+ch8-1index.jsp:               value="${user.email}"><br>
+ch8-1index.jsp:        <label class="pad_top">First Name:</label>
+ch8-1index.jsp:        <input type="text" name="firstName" 
+ch8-1index.jsp:               value="${user.firstName}"><br>
+ch8-1index.jsp:        <label class="pad_top">Last Name:</label>
+ch8-1index.jsp:        <input type="text" name="lastName" 
+ch8-1index.jsp:               value="${user.lastName}"><br>        
+ch8-1index.jsp:        <label>&nbsp;</label>
+ch8-1index.jsp:        <input type="submit" value="Join Now" class="margin_left">
+ch8-1index.jsp:    </form>
+ch8-1index.jsp:
+ch8-1index.jsp:    
+ch8-1index.jsp:    
+ch8-1index.jsp:</body>
+ch8-1index.jsp:</html>
+ch8-1thanks.jsp:<!DOCTYPE html>
+ch8-1thanks.jsp:<html>
+ch8-1thanks.jsp:<head>
+ch8-1thanks.jsp:    <meta charset="utf-8">
+ch8-1thanks.jsp:    <title>Murach's Java Servlets and JSP</title>
+ch8-1thanks.jsp:    <link rel="stylesheet" href="styles/main.css" type="text/css"/>
+ch8-1thanks.jsp:</head>
+ch8-1thanks.jsp:
+ch8-1thanks.jsp:<body>
+ch8-1thanks.jsp:    <h1>Thanks for joining our email list</h1>
+ch8-1thanks.jsp:
+ch8-1thanks.jsp:    <p>Here is the information that you entered:</p>
+ch8-1thanks.jsp:
+ch8-1thanks.jsp:    <%--
+ch8-1thanks.jsp:    <jsp:useBean id="user" scope="session" class="murach.business.User"/>
+ch8-1thanks.jsp:    <label>Email:</label>
+ch8-1thanks.jsp:    <span><jsp:getProperty name="user" property="email"/></span><br>
+ch8-1thanks.jsp:    <label>First Name:</label>
+ch8-1thanks.jsp:    <span><jsp:getProperty name="user" property="firstName"/></span><br>
+ch8-1thanks.jsp:    <label>Last Name:</label>
+ch8-1thanks.jsp:    <span><jsp:getProperty name="user" property="lastName"/></span><br>
+ch8-1thanks.jsp:    --%>
+ch8-1thanks.jsp:    
+ch8-1thanks.jsp:    
+ch8-1thanks.jsp:    <label>Email:</label>
+ch8-1thanks.jsp:    <span>${user.email}</span><br>
+ch8-1thanks.jsp:    <label>First Name:</label>
+ch8-1thanks.jsp:    <span>${user.firstName}</span><br>
+ch8-1thanks.jsp:    <label>Last Name:</label>
+ch8-1thanks.jsp:    <span>${user.lastName}</span><br>
+ch8-1thanks.jsp:
+ch8-1thanks.jsp:    <p>To enter another email address, click on the Back 
+ch8-1thanks.jsp:    button in your browser or the Return button shown 
+ch8-1thanks.jsp:    below.</p>
+ch8-1thanks.jsp:
+ch8-1thanks.jsp:    <form action="" method="get">
+ch8-1thanks.jsp:        <input type="hidden" name="action" value="join">
+ch8-1thanks.jsp:        <input type="submit" value="Return">
+ch8-1thanks.jsp:    </form>
+ch8-1thanks.jsp:    <p/>
+ch8-1thanks.jsp:    <label>Current Date: </label>
+ch8-1thanks.jsp:    <span>${requestScope.currentDate}</span><br/>
+ch8-1thanks.jsp:    <label>User1: </label>
+ch8-1thanks.jsp:    <span>${sessionScope.users[0].firstName} ${users[0].lastName}</span><br/>
+ch8-1thanks.jsp:    <label>User2: </label>
+ch8-1thanks.jsp:    <span>${users[1].firstName} ${users[1].lastName}</span><br/>
+ch8-1thanks.jsp:    <label>Customer Service: </label>
+ch8-1thanks.jsp:    <span>${initParam.custServEmail}</span>
+ch8-1thanks.jsp:</body>
+ch8-1thanks.jsp:</html>
