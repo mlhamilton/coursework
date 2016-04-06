@@ -97,13 +97,16 @@ public class CartServlet extends HttpServlet {
 
             //validate the parameters
             String message;
+            String star;
             if (code == null || description == null || newPrice == null ||
                 code.isEmpty() || description.isEmpty() || newPrice.isEmpty()) {
                 message = "Please fill out the required fields.";
+                star = "*";
                 url = "addEdit.jsp";
             }
             else {
                 message = "";
+                star = "";
                 product.setDescription(description);
                 product.setPrice(price);
                 product.setCode(code);
