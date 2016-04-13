@@ -1,13 +1,13 @@
-package murach.cart;
+package music.cart;
 
+import music.business.Product;
+import music.data.ProductDB;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import murach.data.*;
-import murach.business.*;
 
 public class CartServlet extends HttpServlet {
 
@@ -24,9 +24,10 @@ public class CartServlet extends HttpServlet {
         // Get session
         HttpSession session = request.getSession();
         
+        //P3 Edit: This draws info from text file, not db
         // Make ProductIO available
-        String path = sc.getRealPath("/WEB-INF/products.txt");
-        ProductIO.init(path);
+        //String path = sc.getRealPath("/WEB-INF/products.txt");
+        //ProductIO.init(path);
 
         // Get what the servlet is being asked to do
         String action = request.getParameter("action");
@@ -37,15 +38,17 @@ public class CartServlet extends HttpServlet {
         
         // If the action is to displayProducts
         if (action.equals("displayProducts")) {
+            // Redirect to cart.jsp
+            url = "/cart.jsp";
             
             // Store products in an array "products"
-            ArrayList<Product> products = ProductIO.getProducts(path);
+            //ArrayList<Product> products = ProductDB.selectProducts();
+            
+            List<Product> products = ProductDB.selectProducts();
                         
             // Set the attributes products so that jsp has info about it
             session.setAttribute("products", products);
             
-            // Redirect to cart.jsp
-            url = "/cart.jsp";
             sc.getRequestDispatcher(url)
                 .forward(request, response);
             
