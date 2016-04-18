@@ -14,13 +14,11 @@
         <i>${message}</i>
         <form action="productMaint" method="post">
             <label class="pad_top"> Code: </label>
-            <input type="text" name="code" value="${product.code}" readonly><br/>
+            <input type="text" name="code" value="${product.code}" readonly><a style="color:red">${star}</a><br/>
             <label class="pad_top"> Description: </label>
             <input type="text" name="description" value="${product.description}" required><br/>
             <label class="pad_top"> Price: </label>
             <input type="text" name="price" value="${product.price}" required><br/>
-
-
           <input type="hidden" name="action" value="updateProduct">
           <input type="submit" value="Update Product">
         </form>
@@ -29,6 +27,6 @@
           <input type="hidden" name="action" value="displayProducts">
           <input type="submit" value="View Products">
         </form>
-    
+            <p style="color:red">${updated_message}</p>
 </body>
 </html>

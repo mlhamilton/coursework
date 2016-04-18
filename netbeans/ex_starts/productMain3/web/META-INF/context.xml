@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/productMain3">
-  <Resource name="jdbc/musicDB" type="javax.sql.DataSource" auth="Container" 
+   <!-- the murach database that contains admin usernames and passwords -->
+    <Resource name="jdbc/musicDB" type="javax.sql.DataSource" auth="Container" 
             driverClassName="com.mysql.jdbc.Driver" 
             url="jdbc:mysql://localhost:3306/music?autoReconnect=true" 
-            username="root" password="sesame" 
+            username="root" password="1uat@M!1" 
             logAbandoned="true" 
             removeAbandoned="true" removeAbandonedTimeout="60" 
             maxActive="100" maxIdle="30" maxWait="10000" />
 
-  <!-- the murach database that contains admin usernames and passwords -->
-  <Resource name="jdbc/murachDB" type="javax.sql.DataSource" auth="Container" 
-            driverClassName="com.mysql.jdbc.Driver" 
-            url="jdbc:mysql://localhost:3306/murach?autoReconnect=true" 
-            username="root" password="sesame" 
-            logAbandoned="true" 
-            removeAbandoned="true" removeAbandonedTimeout="60" 
-            maxActive="100" maxIdle="30" maxWait="10000" />
+ 
+
   
   <Realm dataSourceName="jdbc/murachDB" localDataSource="true" 
          className="org.apache.catalina.realm.DataSourceRealm" 
