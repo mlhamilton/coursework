@@ -95,37 +95,37 @@ public class CartServlet extends HttpServlet {
                 //Update message
                 //String updated_message = "Record Updated!";
                 //session.setAttribute("updated_message", updated_message);
-
                 //Updates object info in JSP
                 product.setDescription(description);
                 product.setPrice(price);
                 product.setCode(code);
-                
+
                 //Call update SQL method
                 ProductDB.updateProduct(code, product);
 
                 // Set the attributes products so that jsp has info about it
-                session.setAttribute("product", product);    
+                session.setAttribute("product", product);
             }
             // Redirect
             url = "/editProduct.jsp";
             sc.getRequestDispatcher(url)
                     .forward(request, response);
-            
-            
-            
-            
+
         } else if (action.equals("viewProducts")) {
             url = "/cart.jsp";
             sc.getRequestDispatcher(url)
                     .forward(request, response);
+
         } else if (action.equals("deleteProduct")) {
 
-            // Determine product code
-            String code = request.getParameter("code");
+            url = "/delete.jsp";
 
-            // Get description/price of known urlCode from ProductIO/Product.java
-            Product product = ProductDB.selectProduct(code);
+            // Determine product code
+            String urlCode = request.getParameter("code");
+
+            // Get description/price of known urlCode from ProductDB
+            Product product = ProductDB.selectProduct(urlCode);
+            String code = product.getCode();
             String description = product.getDescription();
             Double price = product.getPrice();
 
@@ -135,48 +135,53 @@ public class CartServlet extends HttpServlet {
             session.setAttribute("description", description);
             session.setAttribute("price", price);
 
-            url = "/delete.jsp";
-
             sc.getRequestDispatcher(url)
                     .forward(request, response);
-        } else if (action.equals("yesDelete")) {
 
-            // Determine product code
-            String code = request.getParameter("code");
+        } else if (action.equals("yesDelete")) {
+            
+            // TODO: FIGURE OUT WHAT TYPE THIS OBJECT ACCEPTS
+            //String code = session.getAttribute("code");
+            
+            
 
             // Get description/price of known urlCode from ProductIO/Product.java
-            String description = request.getParameter("description");
-            String newPrice = request.getParameter("price");
-
-            // Delete product
             Product product = ProductDB.selectProduct(code);
+            
+            //Delete from DB
+            ProductDB.deleteProduct(product);
 
-            //P3 EDIT - TODO: SQL Query to delete products
-            //ProductDB.deleteProduct(product);
-            List<Product> products = ProductDB.selectProducts();
-            session.setAttribute("products", products);
+            //Update cart
+            action.equals("displayProducts");
 
-            // Redirect
-            url = "/cart.jsp";
+            //NOT SURE WHEN I NEED TO CALL THESE    
             sc.getRequestDispatcher(url)
                     .forward(request, response);
+
         } else if (action.equals("addProduct")) {
             url = "/addProduct.jsp";
             sc.getRequestDispatcher(url)
                     .forward(request, response);
-        } else if (action.equals("sqlAddProduct")){
-            
+        } else if (action.equals("sqlAddProduct")) {
+
             // Create product object from request/JSP
             String code = request.getParameter("code");
             String description = request.getParameter("description");
-            String newPrice = request.getParameter("price");        
+            String newPrice = request.getParameter("price");
             Double price = Double.parseDouble(newPrice);
             Product product = new Product();
-            
-            //Send product to ProductDB
+            product.setDescription(description);
+            product.setPrice(price);
+            product.setCode(code);
+
+            //Send product to ProductDB to add to DB
             ProductDB.addProduct(code, product);
-            
-            url = "/cart.jsp";
+
+            //Go back to cart
+            //url = "/cart.jsp";
+            //Display updated products
+            action.equals("displayProducts");
+
             sc.getRequestDispatcher(url)
                     .forward(request, response);
         }

@@ -139,17 +139,37 @@ public class ProductDB {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
-        String query = "INSERT INTO Product "
-                + "(ProductCode, ProductDescription, ProductPrice) "
-                + "VALUES (?, ?, ?)"
-                + "WHERE ProductCode = ?";
+        String query = "INSERT INTO Product (ProductCode, ProductDescription, ProductPrice) "
+                + "VALUES (?, ?, ?)";
         try {
             //Get variables from JSP>Product.java
             ps = connection.prepareStatement(query);
             ps.setString(1, product.getCode());
             ps.setString(2, product.getDescription());
             ps.setDouble(3, product.getPrice());
-            ps.setString(4, product.getCode());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            System.err.println(e);
+            //return null;
+        } finally {
+            DBUtil.closeResultSet(rs);
+            DBUtil.closePreparedStatement(ps);
+            pool.freeConnection(connection);
+        }
+    }
+    
+    public static void deleteProduct(Product product) {
+        ConnectionPool pool = ConnectionPool.getInstance();
+        Connection connection = pool.getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        String query = "DELETE FROM Product "
+                + "WHERE ProductCode = ?";
+        try {
+            ps = connection.prepareStatement(query);
+            ps.setString(1, product.getCode());
             ps.executeUpdate();
 
         } catch (SQLException e) {
