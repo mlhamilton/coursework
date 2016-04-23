@@ -17,7 +17,7 @@
         <label class="pad_top"> Description: </label>
         <input type="text" name="description" value="${product.description}" required> ${star}<br/>
         <label class="pad_top"> Price: </label>
-        <input type="text" name="price" value="${product.price}" required> ${star}<br/>
+        <input type="text" name="price" value="" required> ${star}<br/>
       <input type="hidden" name="action" value="sqlAddProduct">
       <input class="margin_left" type="submit" value="Add Product">
     </form>

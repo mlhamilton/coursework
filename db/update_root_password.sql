@@ -3,5 +3,8 @@
 *****************************************************************/
 
 UPDATE mysql.user
-SET Password=PASSWORD("sesame")
+SET Password=PASSWORD("1uat@M!1")
 WHERE User='root' AND Host='localhost';
+
+
+SELECT * FROM Download;

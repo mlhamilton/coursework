@@ -10,7 +10,7 @@ public class Product implements Serializable {
     
     private String code;
     private String description;
-    private double price;
+    private Double price;
 
     public Product() {
 
@@ -40,7 +40,7 @@ public class Product implements Serializable {
         return description;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

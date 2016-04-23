@@ -30,7 +30,14 @@ public class CartServlet extends HttpServlet {
 
         // Set default URL
         String url = "/cart.jsp";
-
+        String code = "";
+        String description = "";
+        Double price = null;
+        Product product = new Product();
+        product.setCode(code);
+        product.setDescription(description);
+        product.setPrice(price);
+                
         // If the action is to displayProducts
         if (action.equals("displayProducts")) {
             // Redirect to cart.jsp
@@ -55,10 +62,10 @@ public class CartServlet extends HttpServlet {
             String urlCode = request.getParameter("code");
 
             // Get description/price of known urlCode from ProductDB
-            Product product = ProductDB.selectProduct(urlCode);
-            String code = product.getCode();
-            String description = product.getDescription();
-            Double price = product.getPrice();
+            product = ProductDB.selectProduct(urlCode);
+            code = product.getCode();
+            description = product.getDescription();
+            price = product.getPrice();
 
             // Set the attributes products so that jsp has info about it
             session.setAttribute("product", product);
@@ -71,15 +78,15 @@ public class CartServlet extends HttpServlet {
         } else if (action.equals("updateProduct")) {
 
             // Determine product attributes
-            String code = request.getParameter("code");
-            String description = request.getParameter("description");
+            code = request.getParameter("code");
+            description = request.getParameter("description");
             String newPrice = request.getParameter("price");
 
             // Convert price into into useable value             
-            Double price = Double.parseDouble(newPrice);
+            price = Double.parseDouble(newPrice);
 
             //Create new product to store updated values
-            Product product = new Product();
+            product = new Product();
 
             //Setup required / update messages on click Update
             if (code == null || description == null || newPrice == null
@@ -124,10 +131,10 @@ public class CartServlet extends HttpServlet {
             String urlCode = request.getParameter("code");
 
             // Get description/price of known urlCode from ProductDB
-            Product product = ProductDB.selectProduct(urlCode);
-            String code = product.getCode();
-            String description = product.getDescription();
-            Double price = product.getPrice();
+            product = ProductDB.selectProduct(urlCode);
+            code = product.getCode();
+            description = product.getDescription();
+            price = product.getPrice();
 
             // Set the attributes products so that jsp has info about it
             session.setAttribute("product", product);
@@ -141,35 +148,36 @@ public class CartServlet extends HttpServlet {
         } else if (action.equals("yesDelete")) {
             
             // TODO: FIGURE OUT WHAT TYPE THIS OBJECT ACCEPTS
-            //String code = session.getAttribute("code");
+            code = (String) session.getAttribute("code");
             
-            
-
             // Get description/price of known urlCode from ProductIO/Product.java
-            Product product = ProductDB.selectProduct(code);
+            product = ProductDB.selectProduct(code);
             
             //Delete from DB
             ProductDB.deleteProduct(product);
 
-            //Update cart
-            action.equals("displayProducts");
-
-            //NOT SURE WHEN I NEED TO CALL THESE    
-            sc.getRequestDispatcher(url)
-                    .forward(request, response);
+            //Display updated products
+            action = "displayProducts";
+            String contextPath = request.getContextPath();
+            response.sendRedirect(contextPath + "/productMaint?action=displayProducts");
 
         } else if (action.equals("addProduct")) {
+            
+            
             url = "/addProduct.jsp";
+            session.setAttribute("product", product);
+            
             sc.getRequestDispatcher(url)
                     .forward(request, response);
+            
         } else if (action.equals("sqlAddProduct")) {
 
             // Create product object from request/JSP
-            String code = request.getParameter("code");
-            String description = request.getParameter("description");
+            code = request.getParameter("code");
+            description = request.getParameter("description");
             String newPrice = request.getParameter("price");
-            Double price = Double.parseDouble(newPrice);
-            Product product = new Product();
+            price = Double.parseDouble(newPrice);
+            //product = new Product();
             product.setDescription(description);
             product.setPrice(price);
             product.setCode(code);
@@ -179,11 +187,11 @@ public class CartServlet extends HttpServlet {
 
             //Go back to cart
             //url = "/cart.jsp";
+            
             //Display updated products
-            action.equals("displayProducts");
-
-            sc.getRequestDispatcher(url)
-                    .forward(request, response);
+            action = "displayProducts";
+            String contextPath = request.getContextPath();
+            response.sendRedirect(contextPath + "/productMaint?action=displayProducts");
         }
     }
 
