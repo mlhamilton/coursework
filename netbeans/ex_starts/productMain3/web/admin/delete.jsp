@@ -10,10 +10,18 @@
     <h1>Are you sure you want to delete this product?</h1>
     
 <form action="productMaint" method="post">
-    <!--FIGURE THIS OUT-->
-    Code: </label type="text" name="code" value="${product.code}"><br/>
-    Description: ${product.description}<br/>
-    Price: ${product.price}<br/>
+    <table>
+        <tr>
+            <td>Code: </td><td>${product.code}</td>
+        </tr>
+        <tr>
+            <td>Description:</td><td>${product.description}</td>
+        </tr>
+        <tr>
+            <td>Price:</td><td>${product.price}</td>
+        </tr>
+    </table>
+    
   <input type="hidden" name="action" value="yesDelete">
   <input type="submit" value="Yes">
   <input type="hidden" name="action" value="displayProducts">

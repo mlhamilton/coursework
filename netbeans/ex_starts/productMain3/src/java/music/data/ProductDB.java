@@ -84,7 +84,7 @@ public class ProductDB {
         try {
             ps = connection.prepareStatement(query);
             rs = ps.executeQuery();
-            //P3 Edit: Added Product to new Arraylist<Product>
+            
             ArrayList<Product> products = new ArrayList<Product>();
             while (rs.next()) {
                 Product p = new Product();
@@ -125,7 +125,7 @@ public class ProductDB {
 
         } catch (SQLException e) {
             System.err.println(e);
-            //return null;
+            
         } finally {
             DBUtil.closeResultSet(rs);
             DBUtil.closePreparedStatement(ps);
@@ -151,7 +151,7 @@ public class ProductDB {
 
         } catch (SQLException e) {
             System.err.println(e);
-            //return null;
+            
         } finally {
             DBUtil.closeResultSet(rs);
             DBUtil.closePreparedStatement(ps);
@@ -174,7 +174,7 @@ public class ProductDB {
 
         } catch (SQLException e) {
             System.err.println(e);
-            //return null;
+            
         } finally {
             DBUtil.closeResultSet(rs);
             DBUtil.closePreparedStatement(ps);

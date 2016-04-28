@@ -21,10 +21,6 @@ public class CartServlet extends HttpServlet {
         // Get session
         HttpSession session = request.getSession();
 
-        //P3 Edit: This draws info from text file, not db
-        // Make ProductIO available
-        //String path = sc.getRealPath("/WEB-INF/products.txt");
-        //ProductIO.init(path);
         // Get what the servlet is being asked to do
         String action = request.getParameter("action");
 
@@ -44,7 +40,6 @@ public class CartServlet extends HttpServlet {
             url = "/cart.jsp";
 
             // Store products in an array "products"
-            //ArrayList<Product> products = ProductDB.selectProducts();
             List<Product> products = ProductDB.selectProducts();
 
             // Set the attributes products so that jsp has info about it
@@ -82,7 +77,7 @@ public class CartServlet extends HttpServlet {
             description = request.getParameter("description");
             String newPrice = request.getParameter("price");
 
-            // Convert price into into useable value             
+            // Convert price into a useable value             
             price = Double.parseDouble(newPrice);
 
             //Create new product to store updated values
@@ -100,8 +95,9 @@ public class CartServlet extends HttpServlet {
             } else {
 
                 //Update message
-                //String updated_message = "Record Updated!";
-                //session.setAttribute("updated_message", updated_message);
+                String updated_message = "Record Updated!";
+                session.setAttribute("updated_message", updated_message);
+                
                 //Updates object info in JSP
                 product.setDescription(description);
                 product.setPrice(price);
@@ -113,6 +109,7 @@ public class CartServlet extends HttpServlet {
                 // Set the attributes products so that jsp has info about it
                 session.setAttribute("product", product);
             }
+            
             // Redirect
             url = "/editProduct.jsp";
             sc.getRequestDispatcher(url)
@@ -147,7 +144,7 @@ public class CartServlet extends HttpServlet {
 
         } else if (action.equals("yesDelete")) {
             
-            // TODO: FIGURE OUT WHAT TYPE THIS OBJECT ACCEPTS
+            //Get code from jsp and turn it into string code
             code = (String) session.getAttribute("code");
             
             // Get description/price of known urlCode from ProductIO/Product.java
@@ -172,21 +169,18 @@ public class CartServlet extends HttpServlet {
             
         } else if (action.equals("sqlAddProduct")) {
 
-            // Create product object from request/JSP
+            // Create product object from request
             code = request.getParameter("code");
             description = request.getParameter("description");
             String newPrice = request.getParameter("price");
             price = Double.parseDouble(newPrice);
-            //product = new Product();
+            
             product.setDescription(description);
             product.setPrice(price);
             product.setCode(code);
 
             //Send product to ProductDB to add to DB
             ProductDB.addProduct(code, product);
-
-            //Go back to cart
-            //url = "/cart.jsp";
             
             //Display updated products
             action = "displayProducts";
