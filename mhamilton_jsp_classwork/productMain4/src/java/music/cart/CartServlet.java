@@ -55,9 +55,17 @@ public class CartServlet extends HttpServlet {
 
             // Determine product code
             String urlCode = request.getParameter("code");
+            
+            // Determine product id
+            String sproductId = request.getParameter("productId");
+            System.out.println("productId: " + sproductId);
+            Long productId = Long.parseLong(sproductId);
 
+            product = ProductDB.selectProduct(productId);
+            
             // Get description/price of known urlCode from ProductDB
-            product = ProductDB.selectProduct(urlCode);
+            //product = ProductDB.selectProduct(urlCode);
+            
             code = product.getCode();
             description = product.getDescription();
             price = product.getPrice();
@@ -104,7 +112,7 @@ public class CartServlet extends HttpServlet {
                 product.setCode(code);
 
                 //Call update SQL method
-                ProductDB.updateProduct(code, product);
+                //************ProductDB.updateProduct(code, product);
 
                 // Set the attributes products so that jsp has info about it
                 session.setAttribute("product", product);
@@ -126,9 +134,15 @@ public class CartServlet extends HttpServlet {
 
             // Determine product code
             String urlCode = request.getParameter("code");
-
+            
+            //JPA attempt
+            String sproductId = request.getParameter("productId");
+            System.out.println("productId: " + sproductId);
+            Long productId = Long.parseLong(sproductId);
+            product = ProductDB.selectProduct(productId);
+            
             // Get description/price of known urlCode from ProductDB
-            product = ProductDB.selectProduct(urlCode);
+            //**********product = ProductDB.selectProduct(urlCode);
             code = product.getCode();
             description = product.getDescription();
             price = product.getPrice();
@@ -148,10 +162,10 @@ public class CartServlet extends HttpServlet {
             code = (String) session.getAttribute("code");
             
             // Get description/price of known urlCode from ProductIO/Product.java
-            product = ProductDB.selectProduct(code);
+            //*********product = ProductDB.selectProduct(code);
             
             //Delete from DB
-            ProductDB.deleteProduct(product);
+            //******ProductDB.deleteProduct(product);
 
             //Display updated products
             action = "displayProducts";
@@ -180,7 +194,7 @@ public class CartServlet extends HttpServlet {
             product.setCode(code);
 
             //Send product to ProductDB to add to DB
-            ProductDB.addProduct(code, product);
+            //***********ProductDB.addProduct(code, product);
             
             //Display updated products
             action = "displayProducts";

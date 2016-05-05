@@ -2,10 +2,17 @@ package music.business;
 
 import java.io.Serializable;
 import java.text.NumberFormat;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
+
+@Entity
 public class Product implements Serializable {
     
-    //new variable productId
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long productId;
     
     private String code;
