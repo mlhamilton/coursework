@@ -1,13 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/productMain4">
-  <!-- the murach database that contains admin usernames and passwords -->
-  <Resource auth="Container" driverClassName="com.mysql.jdbc.Driver" logAbandoned="true" maxActive="100" maxIdle="30" maxWait="10000" name="jdbc/musicDB" password="sesame" removeAbandoned="true" removeAbandonedTimeout="60" type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/music?autoReconnect=true" username="root"/>
-  <!-- Guessing this is no longer needed    
-    <Realm dataSourceName="jdbc/murachDB" localDataSource="true" 
-           className="org.apache.catalina.realm.DataSourceRealm" 
-           userTable="UserPass" userRoleTable="UserRole" 
-           userNameCol="Username" roleNameCol="Rolename" userCredCol="Password" 
-           debug="99" />
-     -->
-  <Realm className="org.apache.catalina.realm.JDBCRealm" connectionName="root" connectionPassword="sesame" connectionURL="jdbc:mysql://localhost:3306/murach" debug="99" driverName="com.mysql.jdbc.Driver" roleNameCol="Rolename" userCredCol="Password" userNameCol="Username" userRoleTable="UserRole" userTable="UserPass"/>
+  
+    <Resource auth="Container" 
+              driverClassName="com.mysql.jdbc.Driver" 
+              logAbandoned="true" 
+              maxActive="100" 
+              maxIdle="30" 
+              maxWait="10000" 
+              name="jdbc/musicDB" 
+              password="sesame" 
+              removeAbandoned="true" 
+              removeAbandonedTimeout="60" 
+              type="javax.sql.DataSource" 
+              url="jdbc:mysql://localhost:3306/music?autoReconnect=true" 
+              username="root"/>
+     
+    <Realm className="org.apache.catalina.realm.DataSourceRealm" 
+         dataSourceName="jdbc/musicDB" 
+         debug="99" 
+         localDataSource="true" 
+         roleNameCol="Rolename" 
+         userCredCol="Password" 
+         userNameCol="Username" 
+         userRoleTable="UserRole" 
+         userTable="UserPass"/>
+           
+    <!-- Time to ween off plain JDBC
+    <Realm className="org.apache.catalina.realm.JDBCRealm" 
+           connectionName="root" 
+           connectionPassword="sesame" 
+           connectionURL="jdbc:mysql://localhost:3306/murach" 
+           debug="99" driverName="com.mysql.jdbc.Driver" 
+           roleNameCol="Rolename" 
+           userCredCol="Password" 
+           userNameCol="Username" 
+           userRoleTable="UserRole" 
+           userTable="UserPass"/>
+    -->
 </Context>
