@@ -3,44 +3,9 @@ package music.data;
 import java.sql.*;
 import java.util.*;
 import music.business.*;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 public class ProductDB {
 
-    //Retrieve product by primary key
-    public static Product selectProduct(long productID) {
-        EntityManager em = DBUtil.getEmFactory().createEntityManager();
-        try {
-            Product product = em.find(Product.class, productID);
-            return product;
-        } finally {
-            em.close();
-        }
-    }
-    //Retrieve multiple products
-    public static List<Product> selectProducts() {
-        EntityManager em = DBUtil.getEmFactory().createEntityManager();
-        String qString = "SELECT p from Product " +
-                         "WHERE ProductPrice > 0";
-        TypedQuery<Product> q = em.createQuery(qString, Product.class);
-        
-        List<Product> products;
-        try {
-            products = q.getResultList();
-            if (products == null || products.isEmpty())
-                   products = null;
-        } finally {
-            em.close();
-        }
-        return products;
-    }
-    
-    
-    
-    /* This is all old pgpool code
-    
-    
     //This method returns null if a product isn't found.
     public static Product selectProduct(String productCode) {
         ConnectionPool pool = ConnectionPool.getInstance();
@@ -107,7 +72,7 @@ public class ProductDB {
             pool.freeConnection(connection);
         }
     }
-    
+
     //This method returns null if a product isn't found.
     public static List<Product> selectProducts() {
         ConnectionPool pool = ConnectionPool.getInstance();
@@ -138,7 +103,7 @@ public class ProductDB {
             pool.freeConnection(connection);
         }
     }
-    
+
     //Adding methods for CRUD
     public static void updateProduct(String productCode, Product product) {
         ConnectionPool pool = ConnectionPool.getInstance();
@@ -216,5 +181,4 @@ public class ProductDB {
             pool.freeConnection(connection);
         }
     }
-    */
 }
