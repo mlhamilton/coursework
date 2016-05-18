@@ -55,7 +55,7 @@ public class Product implements Serializable {
         return albumName;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

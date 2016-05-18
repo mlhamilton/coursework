@@ -8,15 +8,8 @@
     </head>
     <body>
         <h1>Product Maintenance</h1>
-        <a href="<c:url value='/order/showCart'/>"/>
-                    View Products</a>
-        
-<!--    Just reference junk from the add to cart button                   
-        <form method="post" action="<c:url value='/order/addItem'/>">
-            <input type="hidden" name="productCode" value="${product.code}">
-            <input type="image" src="<c:url value='/images/addtocart.gif'/>" 
-                   width="113" alt="Add to Cart">
--->
-        
+        <form action="<c:url value='/order/showCart'/>" method="get" id="float_left">
+            <input type="submit" value="View Products">
+        </form>
     </body>
 </html>
