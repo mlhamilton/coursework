@@ -23,8 +23,9 @@ public class OrderController extends HttpServlet {
         String requestURI = request.getRequestURI();
         String url = "";
 
-        //shouldn't need this addItem since its in the doget
-        if (requestURI.endsWith("/addItem")) {
+        if (requestURI.endsWith("/showCart")) {
+            url = showCart(request, response);
+        } else if (requestURI.endsWith("/addItem")) {
             url = addItem(request, response);
         } else if (requestURI.endsWith("/updateItem")) {
             url = updateItem(request, response);
@@ -36,10 +37,10 @@ public class OrderController extends HttpServlet {
             url = "/cart/credit_card.jsp";
         } else if (requestURI.endsWith("/edit")) {
             url = edit(request, response);
-       
-//        } else if (requestURI.endsWith("/showCart")) {
-//            url = showCart(request, response);
+        } else if (requestURI.endsWith("/editItem")) {
+            url = editItem(request, response);
         }
+        
         getServletContext()
                 .getRequestDispatcher(url)
                 .forward(request, response);
@@ -53,15 +54,12 @@ public class OrderController extends HttpServlet {
 
         if (requestURI.endsWith("/showCart")) {
             showCart(request, response);
-
         } else if (requestURI.endsWith("/addPage")) {
             url = "/cart/addPage.jsp";
-
         } else if (requestURI.endsWith("/addItem")) {
             addItem(request, response);
-
-        } else if (requestURI.endsWith("/editItem")) {
-            editItem(request, response);
+        } else if (requestURI.endsWith("/edit")) {
+            url = "/cart/editPage.jsp";
         }
 
         getServletContext()
@@ -74,10 +72,10 @@ public class OrderController extends HttpServlet {
 
         List<Product> products = new ArrayList<Product>();
         products = ProductDB.selectProducts();
-        
+
         //Should I be storing this in the session like this?
         request.getSession().setAttribute("products", products);
-        
+
         return defaultURL;
     }
 
@@ -128,9 +126,9 @@ public class OrderController extends HttpServlet {
 
     private String edit(HttpServletRequest request,
             HttpServletResponse response) {
-      
+
         // Determine product code
-        HttpSession session = request.getSession();    
+        HttpSession session = request.getSession();
         String pcode = request.getParameter("productCode");
 
         // Get product from db and unpack values
@@ -139,7 +137,7 @@ public class OrderController extends HttpServlet {
         String code = product.getCode();
         String description = product.getDescription();
         Double price = product.getPrice();
-        
+
         // Set to product
         product.setId(id);
         product.setDescription(description);
@@ -148,7 +146,7 @@ public class OrderController extends HttpServlet {
 
         // Send product
         session.setAttribute("product", product);
-        
+
         return editItemURL;
     }
 
@@ -156,7 +154,7 @@ public class OrderController extends HttpServlet {
             HttpServletResponse response) {
 
         HttpSession session = request.getSession();
-        
+
         // Get values from jsp
         String pid = request.getParameter("id");
         Long id = Long.parseLong(pid);
@@ -173,14 +171,14 @@ public class OrderController extends HttpServlet {
             session.setAttribute("message", message);
             session.setAttribute("star", star);
         } else {
-            
+
             //Updates object info in JSP
             Product product = new Product();
             product.setId(id);
             product.setDescription(description);
             product.setPrice(price);
             product.setCode(code);
-            
+
             //Call update SQL method
             ProductDB.update(product);
 
@@ -190,7 +188,7 @@ public class OrderController extends HttpServlet {
             //Update message
             String updated_message = "Record Updated!";
             session.setAttribute("updated_message", updated_message);
-        } 
-        return "/order/edit";
+        }
+        return editItemURL;
     }
 }

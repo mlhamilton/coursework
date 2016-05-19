@@ -1,17 +1,38 @@
 package music.business;
 
-import java.io.Serializable;
 import java.text.NumberFormat;
+import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
+@Entity
 public class LineItem implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long lineItemId;
+    
+    @OneToOne
     private Product product;
-    private int quantity;
+    
+    private int quantity = 1;
 
-    public LineItem() {}
+    public LineItem() {
+    }
 
-    public void setProduct(Product p) {
-        product = p;
+    public Long getLineItemId() {
+        return lineItemId;
+    }
+
+    public void setLineItemId(Long lineItemId) {
+        this.lineItemId = lineItemId;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public Product getProduct() {

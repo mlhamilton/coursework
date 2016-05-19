@@ -10,7 +10,7 @@
     <body>
         <h1>Product - Edit</h1>
         <i>${message}</i>
-        <form action="<c:url value='/order/editItem'/>" method="get" id="float_left">
+        <form action="<c:url value='/order/editItem'/>" method="post" id="float_left">
             <label class="pad_top"> Code: </label>
             <input type="text" name="code" value="${product.code}" readonly><a style="color:red">${star}</a><br/>
             <label class="pad_top"> Description: </label>
@@ -22,21 +22,11 @@
 
             <input type="hidden" name="id"  value="${product.id}">
             <label>Product ID = ${product.id}</label> <br/>
-
             <input type="submit" value="Update Product">
-
-        </form>
-
-
-        <form action="<c:url value='/order/showCart'/>" method="post">
-            <input type="hidden" name="" 
-                   value="<c:out value='${item.code}'/>">
-            <input type="submit" value="Show Cart post">
-        </form>  
-
+        </form> 
         <form action="<c:url value='/order/showCart'/>" method="get">
             <input type="hidden" name="action" value="showCart">
-            <input type="submit" value="Show Cart get">
+            <input type="submit" value="Show Cart">
         </form>
         <p style="color:red">${updated_message}</p>
     </body>

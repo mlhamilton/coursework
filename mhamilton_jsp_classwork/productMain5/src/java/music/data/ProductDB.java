@@ -1,184 +1,98 @@
 package music.data;
 
-import java.sql.*;
-import java.util.*;
-import music.business.*;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
+
+import music.business.Product;
 
 public class ProductDB {
 
-    //This method returns null if a product isn't found.
-    public static Product selectProduct(String productCode) {
-        ConnectionPool pool = ConnectionPool.getInstance();
-        Connection connection = pool.getConnection();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        String query = "SELECT * FROM Product "
-                + "WHERE ProductCode = ?";
+    public static Product selectProduct(String code) {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        String qString = "SELECT p FROM Product p " +
+                "WHERE p.code = :code";
+        TypedQuery<Product> q = em.createQuery(qString, Product.class);
+        q.setParameter("code", code);
+        Product result = null;
         try {
-            ps = connection.prepareStatement(query);
-            ps.setString(1, productCode);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                Product p = new Product();
-                p.setId(rs.getLong("ProductID"));
-                p.setCode(rs.getString("ProductCode"));
-                p.setDescription(rs.getString("ProductDescription"));
-                p.setPrice(rs.getDouble("ProductPrice"));
-                return p;
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            System.err.println(e);
+            result = q.getSingleResult();
+        } catch (NoResultException ex) {
             return null;
         } finally {
-            DBUtil.closeResultSet(rs);
-            DBUtil.closePreparedStatement(ps);
-            pool.freeConnection(connection);
+            em.close();
         }
-    }
-
-    //This method returns null if a product isn't found.
-    public static Product selectProduct(long productID) {
-        //Establish connection
-        ConnectionPool pool = ConnectionPool.getInstance();
-        Connection connection = pool.getConnection();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        String query = "SELECT * FROM Product "
-                + "WHERE ProductID = ?";
-        try {
-            ps = connection.prepareStatement(query);
-            ps.setLong(1, productID);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                Product p = new Product();
-                p.setId(rs.getLong("ProductID"));
-                p.setCode(rs.getString("ProductCode"));
-                p.setDescription(rs.getString("ProductDescription"));
-                p.setPrice(rs.getDouble("ProductPrice"));
-                return p;
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            System.err.println(e);
-            return null;
-        } finally {
-            DBUtil.closeResultSet(rs);
-            DBUtil.closePreparedStatement(ps);
-            pool.freeConnection(connection);
-        }
-    }
-
-    //This method returns null if a product isn't found.
-    public static List<Product> selectProducts() {
-        ConnectionPool pool = ConnectionPool.getInstance();
-        Connection connection = pool.getConnection();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        String query = "SELECT * FROM Product";
-        try {
-            ps = connection.prepareStatement(query);
-            rs = ps.executeQuery();
-            
-            ArrayList<Product> products = new ArrayList<Product>();
-            while (rs.next()) {
-                Product p = new Product();
-                p.setCode(rs.getString("ProductCode"));
-                p.setDescription(rs.getString("ProductDescription"));
-                p.setPrice(rs.getDouble("ProductPrice"));
-                products.add(p);
-            }
-            return products;
-        } catch (SQLException e) {
-            System.err.println(e);
-            return null;
-        } finally {
-            DBUtil.closeResultSet(rs);
-            DBUtil.closePreparedStatement(ps);
-            pool.freeConnection(connection);
-        }
-    }
-
-    //Adding methods for CRUD
-    public static void updateProduct(String productCode, Product product) {
-        ConnectionPool pool = ConnectionPool.getInstance();
-        Connection connection = pool.getConnection();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        String query = "UPDATE Product SET "
-                + "ProductDescription = ?, "
-                + "ProductPrice = ? "
-                + "WHERE ProductCode = ?";
-        try {
-            //Get variables from JSP>Product.java
-            ps = connection.prepareStatement(query);
-            ps.setString(1, product.getDescription());
-            ps.setDouble(2, product.getPrice());
-            ps.setString(3, product.getCode());
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            System.err.println(e);
-            
-        } finally {
-            DBUtil.closeResultSet(rs);
-            DBUtil.closePreparedStatement(ps);
-            pool.freeConnection(connection);
-        }
-    }
-
-    public static void addProduct(String productCode, Product product) {
-        ConnectionPool pool = ConnectionPool.getInstance();
-        Connection connection = pool.getConnection();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        String query = "INSERT INTO Product (ProductCode, ProductDescription, ProductPrice) "
-                + "VALUES (?, ?, ?)";
-        try {
-            //Get variables from JSP>Product.java
-            ps = connection.prepareStatement(query);
-            ps.setString(1, product.getCode());
-            ps.setString(2, product.getDescription());
-            ps.setDouble(3, product.getPrice());
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            System.err.println(e);
-            
-        } finally {
-            DBUtil.closeResultSet(rs);
-            DBUtil.closePreparedStatement(ps);
-            pool.freeConnection(connection);
-        }
+        
+        return (Product)result;
     }
     
-    public static void deleteProduct(Product product) {
-        ConnectionPool pool = ConnectionPool.getInstance();
-        Connection connection = pool.getConnection();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        String query = "DELETE FROM Product "
-                + "WHERE ProductCode = ?";
+    public static Product selectProduct(long productId) {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        
+        return em.find(Product.class, productId);
+    }
+    
+    public static List<Product> selectProducts() {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        String qString = "SELECT p from Product p";
+        TypedQuery<Product> q = em.createQuery(qString, Product.class);
+        List<Product> results = null;
         try {
-            ps = connection.prepareStatement(query);
-            ps.setString(1, product.getCode());
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            System.err.println(e);
-            
+            results = q.getResultList();
+        } catch (NoResultException ex) {
+            return null;
         } finally {
-            DBUtil.closeResultSet(rs);
-            DBUtil.closePreparedStatement(ps);
-            pool.freeConnection(connection);
+            em.close();
         }
+        
+        return results;
+    }
+    
+    public static void insert(Product product) {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        trans.begin();
+        try {
+            em.persist(product);
+            trans.commit();
+        } catch (Exception e) {
+            System.out.println(e);
+            trans.rollback();
+        } finally {
+            em.close();
+        }
+    }
+    public static void update(Product product) {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        trans.begin();
+        try {
+            //em.persist(product);
+            em.merge(product);
+            
+            trans.commit();
+        } catch (Exception e) {
+            System.out.println(e);
+            trans.rollback();
+        } finally {
+            em.close();
+        }
+    }    
+    public static void delete(Product product) {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        trans.begin();
+        try {
+            em.remove(em.merge(product));
+            trans.commit();
+        } catch (Exception e) {
+            System.out.println(e);
+            trans.rollback();
+        } finally {
+            em.close();
+        }
+              
     }
 }
