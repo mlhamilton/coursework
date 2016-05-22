@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <servlet>
+        <servlet-name>ProductsServlet</servlet-name>
+        <servlet-class>music.cart.ProductsServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>productMaintenance</servlet-name>
+        <servlet-class>music.cart.CartServlet</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>ProductsServlet</servlet-name>
+        <url-pattern>/loadProducts</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>productMaintenance</servlet-name>
+        <url-pattern>/productMaint</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>loadProducts</welcome-file>
+    </welcome-file-list>
+    
+    <security-constraint>
+        <!-- Restrict access to all files in the /admin folder -->
+        <web-resource-collection>
+            <web-resource-name>Protected Area</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+        <!--Authorize the programmer ad service roles-->
+        <auth-constraint>
+            <role-name>programmer</role-name>
+            <role-name>service</role-name>
+        </auth-constraint>
+        
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+   
+    
+        <!-- Define two security roles -->
+    <security-role>
+        <description>customer service employees</description>
+        <role-name>service</role-name>
+    </security-role>
+    <security-role>
+        <description>system administrators</description>
+        <role-name>programmer</role-name>
+    </security-role>
+
+    <!-- Restrict access to all files in the /admin folder -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Protected Area</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+        <!-- Authorize the programmer and service roles -->
+        <auth-constraint>
+            <role-name>programmer</role-name>
+            <role-name>service</role-name>
+        </auth-constraint>
+        <!-- Require a secure connection -->
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <!-- Use form-based authentication -->
+    <!--
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <form-login-config>
+            <form-login-page>/admin/login.html</form-login-page>
+            <form-error-page>/admin/login_error.html</form-error-page>
+        </form-login-config>
+    </login-config>
+    -->
+    
+    <!-- Use basic authentication -->
+    
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>Admin Login</realm-name>
+    </login-config>
+       
+             
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+</web-app>
