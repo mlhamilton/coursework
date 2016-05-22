@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
                         http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
-
-    <display-name>Murach's Servlets and JSP: Music Store site</display-name>
-    <description>The Music Store web site that's described in 
-        Murach's Java Servlets and JSP (3rd Edition)</description>
 
     <!-- define a context initialization parameter -->
     <context-param>
@@ -84,8 +80,9 @@
     <security-constraint>
         <!-- Restrict access to the URLs in the admin directory -->
         <web-resource-collection>
-            <web-resource-name>Admin</web-resource-name>
+            <web-resource-name>Protected Pages</web-resource-name>
             <url-pattern>/admin/*</url-pattern>
+            <url-pattern>/order/*</url-pattern>
         </web-resource-collection>
 
         <!-- Authorize the service and programmer roles -->
@@ -95,11 +92,11 @@
         </auth-constraint>
         
         <!-- Forces a secure connection - remove comments to enable -->
-        <!--
+        
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
-        -->        
+               
     </security-constraint>
 
     <!-- Use form-based authentication to provide access -->
