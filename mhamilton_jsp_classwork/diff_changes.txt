@@ -1,0 +1,13 @@
+Project 3 changes:
+
+diff -rqw productMain3/ productMain2/ | grep differ >> p3.txt; diff -rqw productMain3/ productMain2/ | grep Only | grep -v productMain2 >> p3.txt;
+
+
+
+Project 4 changes:
+
+diff -rqw productMain4.1/ ../netbeans/book_apps/musicStoreJPA | grep differ >> p4.txt; diff -rqw productMain4.1/ ../netbeans/book_apps/musicStoreJPA | grep Only | grep -v ../netbeans/book_apps/musicStoreJPA >> p4.txt;
+
+
+
+for file in `cat p3.txt`; do echo -e "\n$file:\n" >> p3.txt; cat $file >> p3.txt; echo -e "\n\n\n--End of file--\n-----------------------------------------" >> p3.txt; done;

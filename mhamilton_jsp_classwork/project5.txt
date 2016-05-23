@@ -1,0 +1,213 @@
+Project 5:
+
+Index:
+productMain5/web/META-INF/context.xml
+productMain5/web/WEB-INF/web.xml
+productMain5/web/login.jsp
+
+
+
+
+productMain5/web/META-INF/context.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/productMain5">
+    <!-- Implementing the JDBCRealm 
+    <Resource auth="Container" 
+              driverClassName="com.mysql.jdbc.Driver" 
+              logAbandoned="true"
+              maxActive="100" 
+              maxIdle="30" 
+              maxWait="10000" 
+              name="jdbc/murachDB" 
+              password="sesame" 
+              removeAbandoned="true" 
+              removeAbandonedTimeout="60" 
+              type="javax.sql.DataSource" 
+              url="jdbc:mysql://localhost:3306/murach?autoReconnect=true" 
+              username="root"/>
+    
+    <Realm className="org.apache.catalina.realm.JDBCRealm" 
+           drivername="com.mysql.jdbc.Driver"
+           connectionURL="jdbc:mysql://localhost:3306/murach"
+           connectionName="root"
+           connectionPassword="sesame"
+           userTable="UserPass"
+           userNameCol="Username"
+           userCredCol="Password"
+           userRoleTable="UserRole"
+           roleNameCol="Rolename" />
+    -->
+    
+    <!-- Implementing the DataSourceRealm -->
+    <Resource name="jdbc/music_jpa" auth="Container"
+              maxActive="100" maxIdle="30" maxWait="10000"
+              username="root" password="sesame"
+              driverClassName="com.mysql.jdbc.Driver"
+              url="jdbc:mysql://localhost:3306/music_jpa"
+              logAbandonded="true"
+              removeAbandoned="true"
+              removeAbandonedTimeout="60" type="javax.sql.DataSource" />
+    
+    <Realm className="org.apache.catalina.realm.DataSourceRealm" debug="99"
+           dataSourceName="jdbc/music_jpa" localDataSource="true" 
+           roleNameCol="Rolename" 
+           userCredCol="Password" 
+           userNameCol="Username" 
+           userRoleTable="UserRole" 
+           userTable="UserPass"/>
+    
+    
+    
+    
+</Context>
+
+
+
+--End of file--
+-----------------------------------------
+
+productMain5/web/WEB-INF/web.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+                        http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+
+    <!-- define a context initialization parameter -->
+    <context-param>
+        <param-name>custServEmail</param-name>
+        <param-value>custserv@freshcornrecords.com</param-value>
+    </context-param>
+
+    <!-- servlet definitions (alphabetical by complete class name) -->
+    <servlet>
+        <servlet-name>AdminController</servlet-name>
+        <servlet-class>music.controllers.AdminController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CatalogController</servlet-name>
+        <servlet-class>music.controllers.CatalogController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OrderController</servlet-name>
+        <servlet-class>music.controllers.OrderController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserController</servlet-name>
+        <servlet-class>music.controllers.UserController</servlet-class>
+    </servlet>
+
+    <!-- servlet mappings -->
+    <servlet-mapping>
+        <servlet-name>AdminController</servlet-name>
+        <url-pattern>/adminController/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CatalogController</servlet-name>
+        <url-pattern>/catalog/product/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OrderController</servlet-name>
+        <url-pattern>/order/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserController</servlet-name>
+        <url-pattern>/user/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- define a servlet context listener -->
+    <listener>
+        <listener-class>music.util.MusicStoreContextListener</listener-class>
+    </listener>
+
+    <!-- define the welcome files -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <!-- Enable the custom error pages -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error_404.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/error_java.jsp</location>
+    </error-page>
+
+    <!-- Define two security roles -->
+    <security-role>
+        <description>customer service employees</description>
+        <role-name>service</role-name>
+    </security-role>
+    <security-role>
+        <description>programmers</description>
+        <role-name>programmer</role-name>
+    </security-role>
+
+    <security-constraint>
+        <!-- Restrict access to the URLs in the admin directory -->
+        <web-resource-collection>
+            <web-resource-name>Protected Pages</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+            <url-pattern>/order/*</url-pattern>
+        </web-resource-collection>
+
+        <!-- Authorize the service and programmer roles -->
+        <auth-constraint>
+            <role-name>service</role-name>
+            <role-name>programmer</role-name>
+        </auth-constraint>
+        
+        <!-- Forces a secure connection - remove comments to enable -->
+        
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+               
+    </security-constraint>
+
+    <!-- Use form-based authentication to provide access -->
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <form-login-config>
+            <form-login-page>/login.jsp</form-login-page>
+            <form-error-page>/login_error.jsp</form-error-page>
+        </form-login-config>
+    </login-config>
+    
+    <!-- Use cookies (not URL encoding) for session tracking -->
+    <session-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>    
+</web-app>
+
+
+--End of file--
+-----------------------------------------
+
+productMain5/web/login.jsp:
+
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Login Form</h1>
+        <p>Please enter a username and password to continue.</p>
+        <form action="j_security_check" method="post">
+            <label>Username</label>
+            <input type="text" name="j_username"><br>
+            <label>Password</label>
+            <input type="password" name="j_password"><br>
+            <label>&nbsp;</label>
+            <input type="submit" value="Login">
+        </form> 
+    </body>
+</html>
+
+
+
+--End of file--
+-----------------------------------------

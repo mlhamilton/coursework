@@ -1,0 +1,262 @@
+Project 3:
+
+
+Index:
+productMain3/web/META-INF/context.xml
+productMain3/web/WEB-INF/web.xml
+productMain3/web/addProduct.jsp
+productMain3/web/delete.jsp
+productMain3/web/editProduct.jsp
+productMain3/build/web/admin
+productMain3/src/java/music
+productMain3/web/admin
+
+
+
+
+productMain3/web/META-INF/context.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/productMain3">
+    
+    <!-- the murach database that contains admin usernames and passwords -->
+    <Resource name="jdbc/musicDB" type="javax.sql.DataSource" auth="Container" 
+            driverClassName="com.mysql.jdbc.Driver" 
+            url="jdbc:mysql://localhost:3306/music?autoReconnect=true" 
+            username="root" password="sesame" 
+            logAbandoned="true" 
+            removeAbandoned="true" removeAbandonedTimeout="60" 
+            maxActive="100" maxIdle="30" maxWait="10000" />
+    
+    <!-- Guessing this is no longer needed    
+    <Realm dataSourceName="jdbc/murachDB" localDataSource="true" 
+           className="org.apache.catalina.realm.DataSourceRealm" 
+           userTable="UserPass" userRoleTable="UserRole" 
+           userNameCol="Username" roleNameCol="Rolename" userCredCol="Password" 
+           debug="99" />
+     -->
+    
+      <Realm className="org.apache.catalina.realm.JDBCRealm" 
+         connectionName="root" connectionPassword="sesame" 
+         connectionURL="jdbc:mysql://localhost:3306/murach" 
+         debug="99" driverName="com.mysql.jdbc.Driver" 
+         roleNameCol="Rolename" userCredCol="Password" userNameCol="Username" 
+         userRoleTable="UserRole" userTable="UserPass"/>
+      
+</Context>
+
+
+--End of file--
+-----------------------------------------
+
+productMain3/web/WEB-INF/web.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <servlet>
+        <servlet-name>ProductsServlet</servlet-name>
+        <servlet-class>music.cart.ProductsServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>productMaintenance</servlet-name>
+        <servlet-class>music.cart.CartServlet</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>ProductsServlet</servlet-name>
+        <url-pattern>/loadProducts</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>productMaintenance</servlet-name>
+        <url-pattern>/productMaint</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>loadProducts</welcome-file>
+    </welcome-file-list>
+    
+    <security-constraint>
+        <!-- Restrict access to all files in the /admin folder -->
+        <web-resource-collection>
+            <web-resource-name>Protected Area</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+        <!--Authorize the programmer ad service roles-->
+        <auth-constraint>
+            <role-name>programmer</role-name>
+            <role-name>service</role-name>
+        </auth-constraint>
+        
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+   
+    
+        <!-- Define two security roles -->
+    <security-role>
+        <description>customer service employees</description>
+        <role-name>service</role-name>
+    </security-role>
+    <security-role>
+        <description>system administrators</description>
+        <role-name>programmer</role-name>
+    </security-role>
+
+    <!-- Restrict access to all files in the /admin folder -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Protected Area</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+        <!-- Authorize the programmer and service roles -->
+        <auth-constraint>
+            <role-name>programmer</role-name>
+            <role-name>service</role-name>
+        </auth-constraint>
+        <!-- Require a secure connection -->
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <!-- Use form-based authentication -->
+    <!--
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <form-login-config>
+            <form-login-page>/admin/login.html</form-login-page>
+            <form-error-page>/admin/login_error.html</form-error-page>
+        </form-login-config>
+    </login-config>
+    -->
+    
+    <!-- Use basic authentication -->
+    
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>Admin Login</realm-name>
+    </login-config>
+       
+             
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+</web-app>
+
+
+
+--End of file--
+-----------------------------------------
+
+productMain3/web/addProduct.jsp:
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Product Maintenance - Product</title>
+    <link rel="stylesheet" href="styles/main.css" type="text/css"/>
+</head>
+
+
+<body>
+    <h1>Product - Add</h1>
+    <p>* marks required fields</p>
+    <i>${message}</i>
+    <form action="productMaint" method="post">
+        <label class="pad_top"> Code: </label>
+        <input type="text" name="code" value="${product.code}" required> ${star}<br/>
+        <label class="pad_top"> Description: </label>
+        <input type="text" name="description" value="${product.description}" required> ${star}<br/>
+        <label class="pad_top"> Price: </label>
+        <input type="text" name="price" value="" required> ${star}<br/>
+      <input type="hidden" name="action" value="sqlAddProduct">
+      <input class="margin_left" type="submit" value="Add Product">
+    </form>
+
+    <form action="productMaint" method="post">
+      <input type="hidden" name="action" value="displayProducts">
+      <input tclass="margin_left" type="submit" value="View Products">
+    </form>
+    
+</body>
+</html>
+
+
+--End of file--
+-----------------------------------------
+
+productMain3/web/delete.jsp:
+
+<!DOCTYPE html>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Product Maintenance - Delete</title>
+    <link rel="stylesheet" href="styles/main.css" type="text/css"/>
+</head>
+<body>
+    <h1>Are you sure you want to delete this product?</h1>
+    
+<form action="productMaint" method="post">
+    <table>
+        <tr>
+            <td>Code: </td><td>${product.code}</td>
+        </tr>
+        <tr>
+            <td>Description:</td><td>${product.description}</td>
+        </tr>
+        <tr>
+            <td>Price:</td><td>${product.price}</td>
+        </tr>
+    </table>
+    
+  <input type="hidden" name="action" value="yesDelete">
+  <input type="submit" value="Yes">
+  <input type="hidden" name="action" value="displayProducts">
+  <input type="submit" value="No">
+</form>
+    
+</body>
+</html>
+
+
+--End of file--
+-----------------------------------------
+
+productMain3/web/editProduct.jsp:
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Product Maintenance - Product</title>
+    <link rel="stylesheet" href="styles/main.css" type="text/css"/>
+</head>
+
+
+<body>
+    <h1>Product - Edit</h1>
+    
+        <p>* marks required fields</p>
+        <i>${message}</i>
+        <form action="productMaint" method="post">
+            <label class="pad_top"> Code: </label>
+            <input type="text" name="code" value="${product.code}" readonly><a style="color:red">${star}</a><br/>
+            <label class="pad_top"> Description: </label>
+            <input type="text" name="description" value="${product.description}" required><br/>
+            <label class="pad_top"> Price: </label>
+            <input type="text" name="price" value="${product.price}" required><br/>
+          <input type="hidden" name="action" value="updateProduct">
+          <input type="submit" value="Update Product">
+        </form>
+
+        <form action="productMaint" method="post">
+          <input type="hidden" name="action" value="displayProducts">
+          <input type="submit" value="View Products">
+        </form>
+            <p style="color:red">${updated_message}</p>
+</body>
+</html>

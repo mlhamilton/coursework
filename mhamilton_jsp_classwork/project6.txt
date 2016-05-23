@@ -1,0 +1,1052 @@
+
+Index:
+productMain6/src/java/music/business/Product.java
+productMain6/src/java/music/controllers/OrderController.java
+productMain6/src/java/music/controllers/ProductController.java
+productMain6/src/java/music/data/ProductDB.java
+productMain6/web/META-INF/context.xml
+productMain6/web/WEB-INF/web.xml
+productMain6/web/admin/addPage.jsp
+productMain6/web/admin/cart.jsp
+productMain6/web/admin/editPage.jsp
+productMain6/web/admin/index.jsp
+
+
+productMain6/src/java/music/business/Product.java:
+
+package music.business;
+
+import java.text.NumberFormat;
+import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Product implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long productId;    
+    private String code;
+    private String description;
+    private double price;
+
+    public Product() {}
+
+    public Long getId() {
+        return productId;
+    }
+
+    public void setId(Long productId) {
+        this.productId = productId;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getArtistName() {
+        String artistName = 
+                description.substring(0, description.indexOf(" - "));
+        return artistName;
+    }
+
+    public String getAlbumName() {
+        String albumName = 
+                description.substring(description.indexOf(" - ") + 3);
+        return albumName;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public String getPriceCurrencyFormat() {
+        NumberFormat currency = NumberFormat.getCurrencyInstance();
+        return currency.format(price);
+    }
+
+    public String getImageURL() {
+        String imageURL = "/musicStore/images/" + code + "_cover.jpg";
+        return imageURL;
+    }
+
+    public String getProductType() {
+        return "Audio CD";
+    }
+}
+
+
+--End of file--
+-----------------------------------------
+
+productMain6/src/java/music/controllers/OrderController.java:
+
+package music.controllers;
+
+import java.io.IOException;
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+import javax.servlet.http.*;
+
+import music.business.*;
+import music.data.*;
+import music.util.*;
+
+public class OrderController extends HttpServlet {
+    private static final String defaultURL = "/cart/cart.jsp";
+    
+    @Override
+    public void doPost(HttpServletRequest request, 
+            HttpServletResponse response)
+            throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+        String url = "";
+        if (requestURI.endsWith("/addItem")) {
+            url = addItem(request, response);
+        } else if (requestURI.endsWith("/updateItem")) {
+            url = updateItem(request, response);
+        } else if (requestURI.endsWith("/removeItem")) {
+            url = removeItem(request, response);
+        } else if (requestURI.endsWith("/checkUser")) {
+            url = checkUser(request, response);
+        } else if (requestURI.endsWith("/processUser")) {
+            url = processUser(request, response);
+        } else if (requestURI.endsWith("/displayInvoice")) {
+            url = displayInvoice(request, response);
+        } else if (requestURI.endsWith("/displayUser")) {
+            url = "/cart/user.jsp";
+        } else if (requestURI.endsWith("/displayCreditCard")) {
+            url = "/cart/credit_card.jsp";
+        } else if (requestURI.endsWith("/completeOrder")) {
+            url = completeOrder(request, response);
+        }
+        getServletContext()
+                .getRequestDispatcher(url)
+                .forward(request, response);
+    }
+    
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+        String url = defaultURL;
+        if (requestURI.endsWith("/showCart")) {
+            showCart(request, response);
+        } else if (requestURI.endsWith("/checkUser")) {
+            url = checkUser(request, response);
+        }
+        getServletContext()
+                .getRequestDispatcher(url)
+                .forward(request, response);
+    }
+    
+    private String showCart(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Cart cart = (Cart) session.getAttribute("cart");
+        if (cart == null || cart.getCount() == 0) {
+            request.setAttribute("emptyCart", "Your cart is empty");
+        } else {
+            request.getSession().setAttribute("cart", cart);
+        }
+        return defaultURL;
+    }
+    
+    private String addItem(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Cart cart = (Cart) session.getAttribute("cart");
+        if (cart == null)
+            cart = new Cart();
+        String productCode = request.getParameter("productCode");
+        Product product = ProductDB.selectProduct(productCode);
+        if (product != null) {
+            LineItem lineItem = new LineItem();
+            lineItem.setProduct(product);
+            cart.addItem(lineItem);
+        }
+        session.setAttribute("cart", cart);
+        return defaultURL;
+    }
+    
+    private String updateItem(HttpServletRequest request,
+            HttpServletResponse response) {
+        String quantityString = request.getParameter("quantity");
+        String productCode = request.getParameter("productCode");
+        HttpSession session = request.getSession();
+        Cart cart = (Cart) session.getAttribute("cart");
+        int quantity;
+        try {
+            quantity = Integer.parseInt(quantityString);
+            if (quantity < 0)
+                quantity = 1;
+        } catch (NumberFormatException ex) {
+            quantity = 1;
+        }
+        Product product = ProductDB.selectProduct(productCode);
+        if (product != null && cart != null) {
+            LineItem lineItem = new LineItem();
+            lineItem.setProduct(product);
+            lineItem.setQuantity(quantity);
+            if (quantity > 0)
+                cart.addItem(lineItem);
+            else
+                cart.removeItem(lineItem);
+        }
+        return defaultURL;
+    }
+    
+    private String removeItem(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Cart cart = (Cart) session.getAttribute("cart");
+        String productCode = request.getParameter("productCode");
+        Product product = ProductDB.selectProduct(productCode);
+        if (product != null && cart != null) {
+            LineItem lineItem = new LineItem();
+            lineItem.setProduct(product);
+            cart.removeItem(lineItem);
+        }
+        return defaultURL;
+    }
+    
+    private String checkUser(HttpServletRequest request,
+            HttpServletResponse response) {
+
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+
+        // if the User object exists with address1, skip User page
+        String url = "/cart/user.jsp";
+        if (user != null && !user.getAddress1().equals("")) {
+            url = "/order/displayInvoice";
+        } else {  // otherwise, check the email cookie
+            Cookie[] cookies = request.getCookies();
+            String email
+                    = CookieUtil.getCookieValue(cookies, "emailCookie");
+            if (email.equals("")) {
+                user = new User();
+                url = "/cart/user.jsp";
+            } else {
+                user = UserDB.selectUser(email);
+                if (user != null && !user.getAddress1().equals("")) {
+                    url = "/order/displayInvoice";
+                }
+            }
+        }
+        session.setAttribute("user", user);
+        return url;
+    }
+
+    private String processUser(HttpServletRequest request,
+            HttpServletResponse response) {
+        
+        String firstName = request.getParameter("firstName");
+        String lastName = request.getParameter("lastName");
+        String companyName = request.getParameter("companyName");
+        String email = request.getParameter("email");
+        String address1 = request.getParameter("address1");
+        String address2 = request.getParameter("address2");
+        String city = request.getParameter("city");
+        String state = request.getParameter("state");
+        String zip = request.getParameter("zip");
+        String country = request.getParameter("country");
+
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            user = new User();
+        }
+
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        user.setCompanyName(companyName);
+        user.setAddress1(address1);
+        user.setAddress2(address2);
+        user.setCity(city);
+        user.setState(state);
+        user.setZip(zip);
+        user.setCountry(country);
+        
+        if (UserDB.emailExists(email)) {
+            UserDB.update(user);
+        } else {
+            UserDB.insert(user);
+        }        
+
+        session.setAttribute("user", user);
+
+        return "/order/displayInvoice";
+    }
+
+    private String displayInvoice(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        
+        User user = (User) session.getAttribute("user");       
+        Cart cart = (Cart) session.getAttribute("cart");
+
+        java.util.Date today = new java.util.Date();
+
+        Invoice invoice = new Invoice();
+        invoice.setUser(user);
+        invoice.setInvoiceDate(today);
+        invoice.setLineItems(cart.getItems());
+        
+        session.setAttribute("invoice", invoice);
+        
+        return "/cart/invoice.jsp";
+    }
+    
+    private String completeOrder(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        User user = (User)session.getAttribute("user");
+        Invoice invoice = (Invoice)session.getAttribute("invoice");
+
+        String creditCardType = 
+                request.getParameter("creditCardType");
+        String creditCardNumber = 
+                request.getParameter("creditCardNumber");
+        String creditCardExpMonth = 
+                request.getParameter("creditCardExpirationMonth");
+        String creditCardExpYear = 
+                request.getParameter("creditCardExpirationYear");
+
+        user.setCreditCardType(creditCardType);
+        user.setCreditCardNumber(creditCardNumber);
+        user.setCreditCardExpirationDate(creditCardExpMonth
+                + "/" + creditCardExpYear);
+        
+        // if a record for the User object exists, update it
+        if (UserDB.emailExists(user.getEmail())) {
+            UserDB.update(user);
+        } else { // otherwise, write a new record for the user            
+            UserDB.insert(user);
+        }
+        
+        // write a new invoice record
+        InvoiceDB.insert(invoice);
+        
+        // set the emailCookie in the user's browser.
+        Cookie emailCookie = new Cookie("emailCookie",
+                user.getEmail());
+        emailCookie.setMaxAge(60*24*365*2*60);
+        emailCookie.setPath("/");
+        response.addCookie(emailCookie);
+
+        // remove all items from the user's cart
+        session.setAttribute("cart", null);
+               
+        // send an email to the user to confirm the order.
+        String to = user.getEmail();
+        String from = "confirmation@freshcornrecords.com";
+        String subject = "Order Confirmation";
+        String body = "Dear " + user.getFirstName() + ",\n\n" +
+            "Thanks for ordering from us. " +
+            "You should receive your order in 3-5 business days. " + 
+            "Please contact us if you have any questions.\n" +
+            "Have a great day and thanks again!\n\n" +
+            "Joe King\n" +
+            "Fresh Corn Records";
+        boolean isBodyHTML = false;
+        try {
+            MailUtil.sendMail(to, from, subject, body, isBodyHTML);
+        }
+        catch(MessagingException e) {
+            this.log(
+                "Unable to send email. \n" +
+                "You may need to configure your system as " +
+                "described in chapter 15. \n" +
+                "Here is the email you tried to send: \n" +
+                "=====================================\n" +
+                "TO: " + to + "\n" +
+                "FROM: " + from + "\n" +
+                "SUBJECT: " + subject + "\n" +
+                "\n" +
+                body + "\n\n");
+        }
+        
+        return "/cart/complete.jsp";
+    }    
+}
+
+
+--End of file--
+-----------------------------------------
+
+productMain6/src/java/music/controllers/ProductController.java:
+
+package music.controllers;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+import javax.servlet.http.*;
+
+import music.business.*;
+import music.data.*;
+import music.util.*;
+
+public class ProductController extends HttpServlet {
+
+    private static final String defaultURL = "/admin/cart.jsp";
+    private static final String editItemURL = "/admin/editPage.jsp";
+
+    @Override
+    public void doPost(HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+        String url = "/error_404.jsp";
+
+        if (requestURI.endsWith("/showCart")) {
+            url = showCart(request, response);
+        } else if (requestURI.endsWith("/addItem")) {
+            url = addItem(request, response);
+        } else if (requestURI.endsWith("/updateItem")) {
+            url = updateItem(request, response);
+        } else if (requestURI.endsWith("/removeItem")) {
+            url = removeItem(request, response);
+        } else if (requestURI.endsWith("/edit")) {
+            url = edit(request, response);
+        } else if (requestURI.endsWith("/editItem")) {
+            url = editItem(request, response);
+        }
+        
+        getServletContext()
+                .getRequestDispatcher(url)
+                .forward(request, response);
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+        String url = defaultURL;
+
+        if (requestURI.endsWith("/showCart")) {
+            showCart(request, response);
+        } else if (requestURI.endsWith("/addPage")) {
+            url = "/admin/addPage.jsp";
+        } else if (requestURI.endsWith("/addItem")) {
+            addItem(request, response);
+        } else if (requestURI.endsWith("/edit")) {
+            url = "/admin/editPage.jsp";
+        }
+
+        getServletContext()
+                .getRequestDispatcher(url)
+                .forward(request, response);
+    }
+
+    private String showCart(HttpServletRequest request,
+            HttpServletResponse response) {
+
+        List<Product> products = new ArrayList<>();
+        products = ProductDB.selectProducts();
+
+        //Should I be storing this in the session like this?
+        request.getSession().setAttribute("products", products);
+
+        return defaultURL;
+    }
+
+    private String addItem(HttpServletRequest request,
+            HttpServletResponse response) {
+
+        String code = "";
+        String description = "";
+        Double price = 0.00;
+        Product product = new Product();
+        // Create product object from request
+        code = request.getParameter("code");
+        description = request.getParameter("description");
+        String newPrice = request.getParameter("price");
+        price = Double.parseDouble(newPrice);
+
+        product.setCode(code);
+        product.setDescription(description);
+        product.setPrice(price);
+
+        //Send product to ProductDB to add to DB
+        ProductDB.insert(product);
+
+        return "/product/showCart";
+    }
+
+    private String updateItem(HttpServletRequest request,
+            HttpServletResponse response) {
+
+        String productCode = request.getParameter("productCode");
+        HttpSession session = request.getSession();
+        Cart cart = (Cart) session.getAttribute("cart");
+        Product product = ProductDB.selectProduct(productCode);
+        ProductDB.update(product);
+
+        return defaultURL;
+    }
+
+    private String removeItem(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Cart cart = (Cart) session.getAttribute("cart");
+        String productCode = request.getParameter("productCode");
+        Product product = ProductDB.selectProduct(productCode);
+        ProductDB.delete(product);
+        return "/product/showCart";
+    }
+
+    private String edit(HttpServletRequest request,
+            HttpServletResponse response) {
+
+        // Determine product code
+        HttpSession session = request.getSession();
+        String pcode = request.getParameter("productCode");
+
+        // Get product from db and unpack values
+        Product product = ProductDB.selectProduct(pcode);
+        Long id = product.getId();
+        String code = product.getCode();
+        String description = product.getDescription();
+        Double price = product.getPrice();
+
+        // Set to product
+        product.setId(id);
+        product.setDescription(description);
+        product.setPrice(price);
+        product.setCode(code);
+
+        // Send product
+        session.setAttribute("product", product);
+
+        return editItemURL;
+    }
+
+    private String editItem(HttpServletRequest request,
+            HttpServletResponse response) {
+
+        HttpSession session = request.getSession();
+
+        // Get values from jsp
+        String pid = request.getParameter("id");
+        Long id = Long.parseLong(pid);
+        String code = request.getParameter("code");
+        String description = request.getParameter("description");
+        String newPrice = request.getParameter("price");
+        Double price = Double.parseDouble(newPrice);
+
+        // Check if fields are empty
+        if (code == null || description == null || newPrice == null
+                || code.isEmpty() || description.isEmpty() || newPrice.isEmpty()) {
+            String message = "Please fill out the required fields.";
+            String star = "*";
+            session.setAttribute("message", message);
+            session.setAttribute("star", star);
+        } else {
+
+            //Updates object info in JSP
+            Product product = new Product();
+            product.setId(id);
+            product.setDescription(description);
+            product.setPrice(price);
+            product.setCode(code);
+
+            //Call update SQL method
+            ProductDB.update(product);
+
+            // Set the attributes products so that jsp has info about it
+            session.setAttribute("product", product);
+
+            //Update message
+            String updated_message = "Record Updated!";
+            session.setAttribute("updated_message", updated_message);
+        }
+        return editItemURL;
+    }
+}
+
+
+
+--End of file--
+-----------------------------------------
+
+productMain6/src/java/music/data/ProductDB.java:
+
+package music.data;
+
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
+
+import music.business.Product;
+
+public class ProductDB {
+
+    public static Product selectProduct(String code) {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        String qString = "SELECT p FROM Product p " +
+                "WHERE p.code = :code";
+        TypedQuery<Product> q = em.createQuery(qString, Product.class);
+        q.setParameter("code", code);
+        Product result = null;
+        try {
+            result = q.getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        } finally {
+            em.close();
+        }
+        
+        return (Product)result;
+    }
+    
+    public static Product selectProduct(long productId) {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        
+        return em.find(Product.class, productId);
+    }
+    
+    public static List<Product> selectProducts() {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        String qString = "SELECT p from Product p";
+        TypedQuery<Product> q = em.createQuery(qString, Product.class);
+        List<Product> results = null;
+        try {
+            results = q.getResultList();
+        } catch (NoResultException ex) {
+            return null;
+        } finally {
+            em.close();
+        }
+        
+        return results;
+    }
+        public static void insert(Product product) {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        trans.begin();
+        try {
+            em.persist(product);
+            trans.commit();
+        } catch (Exception e) {
+            System.out.println(e);
+            trans.rollback();
+        } finally {
+            em.close();
+        }
+    }
+    public static void update(Product product) {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        trans.begin();
+        try {
+            //em.persist(product);
+            em.merge(product);
+            
+            trans.commit();
+        } catch (Exception e) {
+            System.out.println(e);
+            trans.rollback();
+        } finally {
+            em.close();
+        }
+    }    
+    public static void delete(Product product) {
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        trans.begin();
+        try {
+            em.remove(em.merge(product));
+            trans.commit();
+        } catch (Exception e) {
+            System.out.println(e);
+            trans.rollback();
+        } finally {
+            em.close();
+        }
+              
+    }
+}
+
+
+--End of file--
+-----------------------------------------
+
+productMain6/web/META-INF/context.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/productMain6">
+  <!-- the murach database that contains admin usernames and passwords -->
+  <Resource auth="Container" driverClassName="com.mysql.jdbc.Driver" logAbandoned="true" maxActive="100" maxIdle="30" maxWait="10000" name="jdbc/murachDB" password="sesame" removeAbandoned="true" removeAbandonedTimeout="60" type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/murach?autoReconnect=true" username="root"/>
+  <Realm className="org.apache.catalina.realm.DataSourceRealm" dataSourceName="jdbc/murachDB" debug="99" localDataSource="true" roleNameCol="Rolename" userCredCol="Password" userNameCol="Username" userRoleTable="UserRole" userTable="UserPass"/>
+</Context>
+
+
+
+--End of file--
+-----------------------------------------
+
+productMain6/web/WEB-INF/web.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+                        http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+
+    <display-name>Murach's Servlets and JSP: Music Store site</display-name>
+    <description>The Music Store web site that's described in 
+        Murach's Java Servlets and JSP (3rd Edition)</description>
+
+    <!-- define a context initialization parameter -->
+    <context-param>
+        <param-name>custServEmail</param-name>
+        <param-value>custserv@freshcornrecords.com</param-value>
+    </context-param>
+
+    <!-- servlet definitions (alphabetical by complete class name) -->
+    <servlet>
+        <servlet-name>AdminController</servlet-name>
+        <servlet-class>music.controllers.AdminController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CatalogController</servlet-name>
+        <servlet-class>music.controllers.CatalogController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OrderController</servlet-name>
+        <servlet-class>music.controllers.OrderController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserController</servlet-name>
+        <servlet-class>music.controllers.UserController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ProductController</servlet-name>
+        <servlet-class>music.controllers.ProductController</servlet-class>
+    </servlet>
+
+    <!-- servlet mappings -->
+    <servlet-mapping>
+        <servlet-name>AdminController</servlet-name>
+        <url-pattern>/adminController/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CatalogController</servlet-name>
+        <url-pattern>/catalog/product/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OrderController</servlet-name>
+        <url-pattern>/order/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserController</servlet-name>
+        <url-pattern>/user/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProductController</servlet-name>
+        <url-pattern>/product/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- define a servlet context listener -->
+    <listener>
+        <listener-class>music.util.MusicStoreContextListener</listener-class>
+    </listener>
+
+    <!-- define the welcome files -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <!-- Enable the custom error pages -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error_404.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/error_java.jsp</location>
+    </error-page>
+
+    <!-- Define two security roles -->
+    <security-role>
+        <description>customer service employees</description>
+        <role-name>service</role-name>
+    </security-role>
+    <security-role>
+        <description>programmers</description>
+        <role-name>programmer</role-name>
+    </security-role>
+
+    <security-constraint>
+        <!-- Restrict access to the URLs in the admin directory -->
+        <web-resource-collection>
+            <web-resource-name>Admin</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+
+        <!-- Authorize the service and programmer roles -->
+        <auth-constraint>
+            <role-name>service</role-name>
+            <role-name>programmer</role-name>
+        </auth-constraint>
+        
+        <!-- Forces a secure connection - remove comments to enable -->
+        <!--
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+        -->        
+    </security-constraint>
+
+    <!-- Use form-based authentication to provide access -->
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <form-login-config>
+            <form-login-page>/login.jsp</form-login-page>
+            <form-error-page>/login_error.jsp</form-error-page>
+        </form-login-config>
+    </login-config>
+    
+    <!-- Use cookies (not URL encoding) for session tracking -->
+    <session-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>    
+</web-app>
+
+
+--End of file--
+-----------------------------------------
+
+productMain6/web/admin/addPage.jsp:
+
+<jsp:include page="/includes/header.jsp" />
+<jsp:include page="/includes/column_left_all.jsp" />
+
+<!-- begin middle column -->
+
+<section class="add">
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+    <html>
+        <head>
+            <meta charset="utf-8">
+            <title>Product Maintenance - Product</title>
+            <link rel="stylesheet" href="styles/main.css" type="text/css"/>
+        </head>
+
+
+        <body>
+            <h1>Product - Add</h1>
+            <p>* marks required fields</p>
+            <i>${message}</i>
+
+            <form action="<c:url value='/product/addItem'/>" method="post" id="float_left">
+                <label class="pad_top"> Code: </label>
+                <input type="text" name="code" value="${product.code}" required> ${star}<br/>
+                <label class="pad_top"> Description: </label>
+                <input type="text" name="description" value="${product.description}" required> ${star}<br/>
+                <label class="pad_top"> Price: </label>
+                <input type="text" name="price" value="" required> ${star}<br/>
+                <input type="hidden" name="action" value="addItem">
+                <input type="submit" value="Add Product">
+            </form>
+        </body>
+
+</section>
+<!-- end middle column -->
+
+<jsp:include page="/includes/footer.jsp" /> 
+
+</html>
+
+
+--End of file--
+-----------------------------------------
+
+productMain6/web/admin/cart.jsp:
+
+<jsp:include page="/includes/header.jsp" />
+<jsp:include page="/includes/column_left_all.jsp" />
+
+<!-- begin middle column -->
+
+<section class="cart">
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+    <h1>Products</h1>
+    <c:choose>
+        <c:when test="${emptyCart != null}">
+            <p>Your cart is empty.</p>
+        </c:when>
+        <c:otherwise>
+            <table>
+                <tr>
+                    <th>Code</th>   
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>&nbsp;</th>
+                </tr>
+                <c:forEach var="item" items="${products}">
+                    <tr class="cart_row">
+                        <td>${item.code}</td>
+                        <td>${item.description}</td>
+                        <td>${item.priceCurrencyFormat}</td>
+                        <td>
+                            <form action="<c:url value='/product/edit'/>" method="post">
+                                <input type="hidden" name="productCode" 
+                                       value="<c:out value='${item.code}'/>">
+                                <input type="submit" value="Edit">
+                            </form>                  
+                        </td>
+                        <td>
+                            <form action="<c:url value='/product/removeItem'/>" method="post">
+                                <input type="hidden" name="productCode" 
+                                       value="<c:out value='${item.code}'/>">
+                                <input type="submit" value="Remove">
+                            </form>                  
+                        </td>
+                    </tr>
+                </c:forEach>
+            </table>
+        </c:otherwise>
+    </c:choose>
+
+
+    <!--Go to add products page-->          
+    <form action="<c:url value='/product/addPage'/>" method="get" id="float_left">
+        <input type="submit" value="Add Product">
+    </form>
+
+
+    <%--<c:if test="${emptyCart == null}">
+        <!-- Connection is NOT SECURE.  For testing only. -->
+        <form action="<c:url value='/order/checkUser'/>" method="post">
+          <input type="submit" value="Checkout">
+        </form>
+        <!-- Connection is SECURE.  Before you can use it, you need to configure 
+        a secure connection on your system as described in chapter 15, comment
+        out the previous form, and remove the comments from the following form. -->
+        <!--
+        <form action="${absolutePathSecure}/order/checkUser" method="post">
+          <input type="submit" value="Checkout">
+        </form>
+        -->
+    </c:if>--%>
+
+
+</section>
+
+<!-- end middle column -->
+
+<jsp:include page="/includes/footer.jsp" />
+
+
+--End of file--
+-----------------------------------------
+
+productMain6/web/admin/editPage.jsp:
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<jsp:include page="/includes/header.jsp" />
+<jsp:include page="/includes/column_left_all.jsp" />
+
+<!-- begin middle column -->
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Product Maintenance - Product</title>
+        <link rel="stylesheet" href="styles/main.css" type="text/css"/>
+    </head>
+    <body>
+        <h1>Product - Edit</h1>
+        <i>${message}</i>
+        <form action="<c:url value='/product/editItem'/>" method="post" id="float_left">
+            <label class="pad_top"> Code: </label>
+            <input type="text" name="code" value="${product.code}" readonly><a style="color:red">${star}</a><br/>
+            <label class="pad_top"> Description: </label>
+            <input type="text" name="description" value="${product.description}" required><br/>
+            <label class="pad_top"> Price: </label>
+            <input type="text" name="price" value="${product.price}" required><br/>
+
+            <input type="hidden" name="action" value="editItem">
+
+            <input type="hidden" name="id"  value="${product.id}">
+            <label>Product ID = ${product.id}</label> <br/>
+            <input type="submit" value="Update Product">
+        </form> 
+        <form action="<c:url value='/product/showCart'/>" method="get">
+            <input type="hidden" name="action" value="showCart">
+            <input type="submit" value="Show Cart">
+        </form>
+        <p style="color:red">${updated_message}</p>
+    </body>
+</html>
+
+<!-- end middle column -->
+
+<jsp:include page="/includes/footer.jsp" />
+
+
+--End of file--
+-----------------------------------------
+
+productMain6/web/admin/index.jsp:
+
+<jsp:include page="/includes/header.jsp" />
+<jsp:include page="/includes/column_left_admin.jsp" />
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!-- begin middle column -->
+
+<section id="admin">
+
+<h1>Admin Menu</h1>
+
+<!-- these Form tags don't force a secure connection -->
+<form action="<c:url value='/adminController/displayInvoices'/>" method="post">
+   <input type="submit" value="Process Invoices" class="left_margin">
+</form>
+<form action="reports.jsp" method="post">
+    <input type="submit" value="Display Reports" class="left_margin">
+</form>
+<form action="<c:url value='/product/showCart'/>" method="post">
+   <input type="submit" value="View Products" class="left_margin">
+</form>
+
+</section>
+
+<!-- end middle column -->
+
+<jsp:include page="/includes/footer.jsp" />
+
+
+--End of file--
+-----------------------------------------
